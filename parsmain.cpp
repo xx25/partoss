@@ -274,6 +274,11 @@ void runmainset(void)
     errexit(2, __FILE__, __LINE__);
   };
   lck = 1;
+  if((areaset = (short)sopen(cfname, O_RDWR | O_BINARY | O_CREAT, SH_DENYWR, S_IRWXU | S_IRWXG | S_IRWXO)) == -1)
+  {
+    mystrncpy(errname, cfname, DirSize);
+    errexit(2, __FILE__, __LINE__);
+  }
 #endif
   chsize(areaset, 0);
   lseek(areaset, 0, SEEK_SET);

@@ -18,8 +18,8 @@ SRCS = archives.cc attach.cc buftomsg.cc \
 BINS = partossl
 
 CC = g++
-CFLAGS =  -O2 -m386 -pipe -static -ansi
-CFLAGS += -Wall -Wstrict-prototypes -Wcast-align
+CFLAGS =  -O2 -pipe -ansi
+CFLAGS += -Wall -Wcast-align
 CFLAGS += -fpack-struct -funsigned-char -fno-common
 CFLAGS += -D_GNU_SOURCE -D_BSD_SOURCE
 #CFLAGS += -D__REMAP__ -D__REMAP_LOWER__

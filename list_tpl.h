@@ -288,7 +288,7 @@ template < class type > std::ostream & operator <<(std::ostream & o, list < type
   while(1)
   {
     if(temp == NULL)
-      return NULL;
+      return o;
     o << temp->data;
     temp = temp->next;
   }
