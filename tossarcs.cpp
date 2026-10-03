@@ -18,6 +18,7 @@
 #include "buftomsg.h"
 #include "buftosqd.h"
 #include "headers.h"
+#include "netfwd.h"
 #include "pkttobuf.h"
 #include "template.h"
 #include "scanbase.h"
@@ -691,7 +692,11 @@ short tosspkt(struct pktname *tpkt)
           taddr = taddr->next;
         }
         if(taddr)
+        {
+          fwdprepare();
           buftomsg(2);
+          fwdsend();
+        }
         else
         {
           if(both && bcfg.pack)

@@ -12,6 +12,7 @@
 #include "buftosqd.h"
 #include "times.h"
 #include "buftopkt.h"
+#include "netfwd.h"
 
 void buftomsg (short type)
 {
@@ -57,7 +58,7 @@ void buftomsg (short type)
       tlist = tlist->next;
     }
 nfound:
-  if (tlist && type == 2 && bcfg.carbnet)
+  if (tlist && type == 2 && bcfg.carbnet && !fwdcopy)
     {
       memcpy (tareaname, newarea->areaname, arealength);
       memcpy (newarea->areaname, tlist->alist[carea].areaname, arealength);
@@ -67,7 +68,7 @@ nfound:
       if (glmove)
 	return;
     }
-  if (type != 1 && type != 4)
+  if (type != 1 && type != 4 && !fwdcopy)
     {
       if (bcfg.netdupes && newarea->dupes)
 	{
@@ -124,7 +125,7 @@ nfound:
 	    }
 	}
     }
-  if (tlist)
+  if (tlist && !fwdcopy)
     tlist->alist[carea].toss++;
   mystrncat (filemsg, "*.msg", 7, DirSize);
   finish = _dos_findfirst (filemsg, findattr, &fblk);
@@ -297,6 +298,8 @@ nfound:
     mywrite (msg, tail, __FILE__, __LINE__);
   wwrite (msg, null1, 1, __FILE__, __LINE__);
   cclose (&msg, __FILE__, __LINE__);
+  if (!fwdcopy)
+    netstored = 1;
   if (bcfg.netsem[0])
     {
       msg =

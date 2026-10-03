@@ -12,6 +12,7 @@
 #include "arealias.h"
 #include "chains.h"
 #include "control.h"
+#include "netfwd.h"
 
 #if defined (__linux__) || defined (__FreeBSD__)
 #include "mappath.h"
@@ -199,9 +200,12 @@ char *keywords[] = {
   "DoNotCheckFD",               // 177
   "FixManagerReadOnly",         // 178
   "DeletedAreaList",            // 179
-  "UseTID"                      // 180
+  "UseTID",                     // 180
+  "NetMailForward",             // 181
+  "NetMailForwardExact",        // 182
+  "NetMailForwardSkip"          // 183
 };
-short numtoken = 181;
+short numtoken = 184;
 
 void runmainset(void)
 {
@@ -402,6 +406,7 @@ void runmainset(void)
   memset(&defaddr, 0, szmyaddr);
   mystrncpy(bcfg.creatfile, mainconf, DirSize);
   parser(mainconf, 0);
+  fwdcheck();
   if(bcfg.grof <= 0 || bcfg.grof > 8)
     bcfg.grof = 8;
   mystrncpy(bcfg.version, version, 19);
@@ -2407,6 +2412,13 @@ void parser(char *file, short level)
           gettoken(level);
           if(strnicmp(token, "No", 2) == 0)
             bcfg.dnutid = 1;
+          break;
+        case 181: // "NetMailForward"
+        case 182: // "NetMailForwardExact"
+          fwdparse(level, (short)(i == 182));
+          break;
+        case 183: // "NetMailForwardSkip"
+          fwdskipparse(level);
           break;
         }
       }

@@ -546,6 +546,14 @@ struct pktname
   struct pktname *next;
 };
 
+struct fwdrule
+{
+  char name[36];
+  struct myaddr match, target;
+  unsigned short exact, byaddr;
+  struct fwdrule *next;
+};
+
 struct bincfg
 {
   unsigned long maindt, packdt, areadt;
@@ -599,6 +607,8 @@ struct bincfg
   struct pktname *inbound;
   struct uplname *bladv;
   struct incl *tgroup;
+  struct fwdrule *fwdrules;
+  struct manname *fwdskip;
 };
 
 struct packer

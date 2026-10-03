@@ -8,7 +8,7 @@ SET(p_sources archives.cpp attach.cpp buftomsg.cpp
   partpost.cpp partserv.cpp partset.cpp partsqd.cpp
   pkttobuf.cpp rebuild.cpp scanbase.cpp sqdtobuf.cpp version.cpp
   template.cpp times.cpp tossarcs.cpp _portlib.cpp mappath.cpp astring.cpp
-  arealias.cpp locks.cpp
+  arealias.cpp locks.cpp netfwd.cpp
 )
 ADD_DEFINITIONS(-D_GNU_SOURCE -D_BSD_SOURCE)
 ADD_EXECUTABLE(partoss ${p_sources})

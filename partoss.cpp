@@ -18,6 +18,7 @@
 #include "attach.h"
 #include "killold.h"
 #include "partpost.h"
+#include "netfwd.h"
 #include "tossarcs.h"
 #include "packets.h"
 #include "chains.h"
@@ -849,6 +850,7 @@ int main(int argc, char **argv)
   deladdr(&(bcfg.tinysb));
   deladdr(&(bcfg.address));
   delname(&(bcfg.myname));
+  fwdfree();
   deladdr(&(bcfg.seenby));
   zg = bcfg.zonegate;
   while(zg)
