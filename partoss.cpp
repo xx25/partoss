@@ -550,7 +550,7 @@ int main(int argc, char **argv)
     logwrite(1, 1);
     ccprintf("\r\n%s\r\n", logout);
   }
-#ifdef __DOS__
+#if defined(__DOS__) && !defined(M_I386)
   sprintf(logout, "You have %d file handles available", hcnt);
   logwrite(1, 3);
   ccprintf("\r\n%s\r\n", logout);

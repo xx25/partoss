@@ -413,7 +413,7 @@ void createarea (char *areaname, short pers, struct myaddr *pktaddr2)
   short i, j;
   short usingshablon = 0;
   unsigned short autonum = 0, tnum, fplen;
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || (defined(__WATCOMC__) && defined(__386__))
   unsigned date, time;
 #else
   unsigned short date, time /*,fyear,fmonth,fday */ ;

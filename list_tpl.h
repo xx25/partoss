@@ -19,7 +19,7 @@
 #ifndef _LIST_TPL
 #define _LIST_TPL
 
-#include <iostream>
+#include <iosfwd>
 
 template < class type > class list_el
 {

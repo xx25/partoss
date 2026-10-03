@@ -55,7 +55,7 @@ void moreHandles (void)
 
 void disableHandles (void)
 {
-#ifdef __DOS__
+#if defined(__DOS__) && !defined(M_I386)
   psp = (unsigned int *)MK_FP (_psp, 0x32);
   psp[1] = FP_OFF (oldArray);
   psp[2] = FP_SEG (oldArray);
@@ -65,7 +65,7 @@ void disableHandles (void)
 
 void enableHandles (void)
 {
-#ifdef __DOS__
+#if defined(__DOS__) && !defined(M_I386)
   psp = (unsigned int *)MK_FP (_psp, 0x32);
   psp[1] = FP_OFF (newHandleArray);
   psp[2] = FP_SEG (newHandleArray);

@@ -22,7 +22,7 @@ short poster (short type)
     13, tfile, cfile;
   short istear, isorig, oldboth, waspost = 0;
   unsigned short fmax2, fday, fmonth, fyear;
-#ifdef __BORLANDC__
+#if defined(__BORLANDC__) || (defined(__WATCOMC__) && defined(__386__))
   unsigned tdate, ttime;
 #else
   unsigned short tdate, ttime;

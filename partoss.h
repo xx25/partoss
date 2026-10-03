@@ -177,7 +177,7 @@
 #if defined(__linux__) || defined(__FreeBSD__)
 #include <sys/stat.h>
 #else
-#include <sys\stat.h>
+#include <sys/stat.h>
 #endif
 #include <ctype.h>
 #include <errno.h>

@@ -8,7 +8,7 @@
 #include "morfiles.h"
 #include "errors.h"
 
-#ifdef __DOS__
+#if defined(__DOS__) && !defined(M_I386)
 
 // #include <spawno.h>
 #include "swapexec.hhh"
