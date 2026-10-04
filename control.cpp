@@ -409,11 +409,14 @@ void getctrl (char *text, unsigned short len, short type)
   struct myaddr faddr;
   struct pool *tpool;
   char att[DirSize + 1], satt[DirSize + 1], tatt[DirSize + 1],
-    source[DirSize + 1];
+    source[DirSize + 1], attkl[2 * DirSize + 16];
+  short attok = 0;
+  int n;
   temp = text;
   numlf = 0;
   lkludnum = lkludlen = 0;
   arealen = 0;
+  arealenold = 0;
   gheadgarb = 0;
   addrfake = 0;
   if (gheadclen == 0)
@@ -488,7 +491,7 @@ void getctrl (char *text, unsigned short len, short type)
       spaces = 0;
       lkludge = 0;
       for (i = 0; i < klnum; i++)
-  if (memcmp (temp, kludges[i], strlen (kludges[i])) == 0)
+  if (strncmp (temp, kludges[i], strlen (kludges[i])) == 0)
     break;
       if (*temp == '\1' || (i < klnum && !((i == 0) && isarea)))
   {
@@ -520,12 +523,12 @@ void getctrl (char *text, unsigned short len, short type)
         temp3 = temp + 5;
         if ((*temp3 == 0) || (*temp3 == term))
     break;
-        while (isspace (*temp3))
+        while (temp3 < temp2 && isspace (*temp3))
     {
       temp3++;
       spaces++;
     }
-        while (isascii (*temp3) && !isspace (*temp3))
+        while (temp3 < temp2 && isascii (*temp3) && !isspace (*temp3))
     temp3++;
         if (temp3 > temp2)
     temp3 = temp2;
@@ -535,7 +538,12 @@ void getctrl (char *text, unsigned short len, short type)
       arealen = (short)(temp3 - temp /*-spaces*/ );
       if (arealen > arealength + 4)
         arealen = arealength + 4;
-      memcpy (curarea, temp + 5 + spaces, arealen - 5 - spaces);
+      n = arealen - 5 - spaces;
+      if (n < 0)
+        n = 0;
+      if (n > arealength - 1)
+        n = arealength - 1;
+      memcpy (curarea, temp + 5 + spaces, n);
       //areaaliasmaker
       /*logprintf("Message from %s, %u:%u/%u.%u to %s, %u:%u/%u.%u about \"%s\"",
          bufpkt.fromname, bufpkt.fromzone, bufpkt.fromnet, bufpkt.fromnode,
@@ -620,6 +628,8 @@ void getctrl (char *text, unsigned short len, short type)
         break;
       case 3:
         temp3 = strchr (temp + 6, ' ');
+        if (temp3 == NULL || temp3 >= temp2)
+    break;
         parseaddr (temp + 6, &faddr, (short)(temp3 - temp - 6));
         if (faddr.zone)
     {
@@ -684,12 +694,12 @@ void getctrl (char *text, unsigned short len, short type)
       temp3 = temp + 6;
       if ((*temp3 == 0) || (*temp3 == term))
         break;
-      while (isspace (*temp3))
+      while (temp3 < temp2 && isspace (*temp3))
         {
           temp3++;
           spaces++;
         }
-      while (isascii (*temp3) && !isspace (*temp3))
+      while (temp3 < temp2 && isascii (*temp3) && !isspace (*temp3))
         temp3++;
       if (temp3 > temp2)
         temp3 = temp2;
@@ -699,8 +709,12 @@ void getctrl (char *text, unsigned short len, short type)
           arealen = (short)(temp3 - temp - 1 - spaces);
           if (arealen > arealength + 4)
       arealen = arealength + 4;
-          memcpy (curarea, temp + 6 + spaces,
-            arealen - 5 - spaces);
+          n = arealen - 5 - spaces;
+          if (n < 0)
+      n = 0;
+          if (n > arealength - 1)
+      n = arealength - 1;
+          memcpy (curarea, temp + 6 + spaces, n);
           areaaliasmaker ();
           arealenold = arealen;
           arealen = strlen (curarea) + 5;
@@ -712,25 +726,45 @@ void getctrl (char *text, unsigned short len, short type)
         break;
       case 8:
         temp3 = temp + 8;
-        while (isspace (*temp3) && (*temp3) != 0 && (*temp3) != term)
+        while (temp3 < temp2 && isspace (*temp3) && (*temp3) != 0
+         && (*temp3) != term)
     temp3++;
         temp4 = temp3;
-        while (!isspace (*temp4) && (*temp4) != 0 && (*temp4) != term)
+        while (temp4 < temp2 && !isspace (*temp4) && (*temp4) != 0
+         && (*temp4) != term)
     temp4++;
+        n = (int)(temp4 - temp3);
+        if (n > DirSize)
+    n = DirSize;
         memset (tatt, 0, DirSize + 1);
-        memcpy (tatt, temp3, (unsigned)(temp4 - temp3));
+        memcpy (tatt, temp3, n);
+        // From a packet take a bare file name only, and only into the
+        // area's pool: the file is moved from WorkDir to the pool, and
+        // rrename() deletes the destination first
+        if (type == 1
+      && (!tatt[0] || strchr (tatt, '/') || strchr (tatt, '\\')
+          || strchr (tatt, ':') || strstr (tatt, "..")
+          || !newarea->pooloffs))
+    {
+      logprintf ("ATTACN kludge ignored (no pool or not a bare file name): %s", tatt);
+      logwrite (1, 3);
+      lkludge = 1;
+      lkludlen += (unsigned short)(temp2 - temp);
+      lkludnum++;
+      break;
+    }
         temp3 = strchr (tatt, DIRSEP[0]);
         if (temp3 == NULL)
     {
+      memset (att, 0, DirSize + 1);
       if (newarea->pooloffs)
         {
+          n = newarea->poollen + 1;
+          if (n > DirSize)
+            n = DirSize;
           lseek (areapool, newarea->pooloffs, SEEK_SET);
-          rread (areapool, att,
-           (unsigned short)(newarea->poollen + 1), __FILE__,
-           __LINE__);
+          rread (areapool, att, (unsigned short)n, __FILE__, __LINE__);
         }
-      else
-        memset (att, 0, DirSize + 1);
       mystrncat (att, tatt, DirSize, DirSize);
       mystrncpy (satt, tatt, DirSize);
     }
@@ -740,13 +774,18 @@ void getctrl (char *text, unsigned short len, short type)
       mystrncpy (satt, temp3 + 1, DirSize);
     }
         temp3 = temp4;
-        while (isspace (*temp3) && (*temp3) != 0 && (*temp3) != term)
+        while (temp3 < temp2 && isspace (*temp3) && (*temp3) != 0
+         && (*temp3) != term)
     temp3++;
         temp4 = temp3;
-        while (!isspace (*temp4) && (*temp4) != 0 && (*temp4) != term)
+        while (temp4 < temp2 && !isspace (*temp4) && (*temp4) != 0
+         && (*temp4) != term)
     temp4++;
+        n = (int)(temp4 - temp3);
+        if (n > DirSize)
+    n = DirSize;
         memset (tatt, 0, DirSize + 1);
-        memcpy (tatt, temp3, (unsigned)(temp4 - temp3));
+        memcpy (tatt, temp3, n);
 
         if (glpool)
     {
@@ -781,7 +820,8 @@ void getctrl (char *text, unsigned short len, short type)
       mystrncat (source, satt, DirSize, DirSize);
       rrename (source, att);
     }
-        logprintf ("\1ATTACH: %s %s\r", satt, tatt);
+        sprintf (attkl, "\1ATTACH: %s %s\r", satt, tatt);
+        attok = 1;
         break;
 
       default:
@@ -815,12 +855,12 @@ void getctrl (char *text, unsigned short len, short type)
         tkludge = tkludge->next;
       }
     tkludge->next = NULL;
-    if (i == 8)
+    if (attok)
       {
         tkludge->str =
-    (char *)myalloc (strlen (logout) + 1, __FILE__, __LINE__);
-        memcpy (tkludge->str, logout, strlen (logout));
-        tkludge->str[strlen (logout)] = 0;
+    (char *)myalloc (strlen (attkl) + 1, __FILE__, __LINE__);
+        strcpy (tkludge->str, attkl);
+        attok = 0;
       }
     else if (i != 0)
       {
