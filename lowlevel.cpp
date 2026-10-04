@@ -1,6 +1,7 @@
 // MaxiM: find_t Ported, changed.
 
 #include "partoss.h"
+#include <stdarg.h>
 #include "globext.h"
 #include "globfunc.h"
 
@@ -233,6 +234,16 @@ unsigned long hash (char *string)
 void mywrite (short handle, char *string, char *file, unsigned short line)
 {
   wwrite (handle, string, (unsigned short)(strlen (string)), file, line);
+}
+
+// sprintf into logout, cut to its size
+void logprintf (const char *format, ...)
+{
+  va_list args;
+  va_start (args, format);
+  vsnprintf (logout, BufSize + 1, format, args);
+  va_end (args);
+  logout[BufSize] = 0;
 }
 
 void logwrite (short first, short level)
@@ -834,9 +845,13 @@ char *mystrncat (char *dest, const char *src, unsigned short len,
 {
   unsigned short size, rest;
   size = (unsigned short)strlen (dest);
+  if (size >= maxsize)
+    return dest;
   rest = (unsigned short)(maxsize - size);
   if (len > rest)
     len = rest;
+  if (len == 0)
+    return dest;
   memset (dest + size, 0, len);
   return (strncat (dest, src, len - 1));
 }

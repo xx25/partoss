@@ -10,6 +10,7 @@ short cmpaddr (struct myaddr *first, struct myaddr *second);
 short cmpaddrw (struct myaddr *first, struct myaddr *second);
 unsigned long hash (char *string);
 void mywrite (short handle, char *string, char *file, unsigned short line);
+void logprintf (const char *format, ...);
 void logwrite (short first, short level);
 void badlog (struct area *barea);
 void parseaddr (char *address, struct myaddr *straddr, short length);
