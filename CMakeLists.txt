@@ -11,4 +11,7 @@ SET(p_sources archives.cpp attach.cpp buftomsg.cpp
   arealias.cpp locks.cpp netfwd.cpp
 )
 ADD_DEFINITIONS(-D_GNU_SOURCE -D_BSD_SOURCE)
+IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  ADD_DEFINITIONS(-fstack-protector-strong -D_FORTIFY_SOURCE=2)
+ENDIF()
 ADD_EXECUTABLE(partoss ${p_sources})

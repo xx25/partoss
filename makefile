@@ -21,6 +21,7 @@ CC = g++
 CFLAGS =  -O2 -pipe -ansi
 CFLAGS += -Wall -Wcast-align
 CFLAGS += -fpack-struct -funsigned-char -fno-common
+CFLAGS += -fstack-protector-strong -D_FORTIFY_SOURCE=2
 CFLAGS += -D_GNU_SOURCE -D_BSD_SOURCE
 #CFLAGS += -D__REMAP__ -D__REMAP_LOWER__
 CPPFLAGS=$(CFLAGS)
