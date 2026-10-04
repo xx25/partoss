@@ -224,11 +224,16 @@ void doserv(void)
         break;
       blink = blink->next;
     }
-    memcpy(&tblink, blink, szlink);
-    if(blink->rules == 1)
-      rulesent = 1;
-    if(blink->rules == 65535ul)
-      rulesent = 0;
+    if(blink == NULL)           // server() only calls us for known links
+      badlink = 2;
+    else
+    {
+      memcpy(&tblink, blink, szlink);
+      if(blink->rules == 1)
+        rulesent = 1;
+      if(blink->rules == 65535ul)
+        rulesent = 0;
+    }
   }
   logprintf("%s message from %u:%u/%u.%u",
           (mode & 1024) ? "Fake" : "Real", mfnode.zone, mfnode.net, mfnode.node, mfnode.point);
@@ -694,8 +699,8 @@ void doserv(void)
         {
           if(j == 30)
           {
-            if(toklen > 71)
-              toklen = 71;
+            if(toklen > 8)      // password[9]
+              toklen = 8;
             mystrncpy(tblink.password, token, toklen);
             tblink.mask |= 512;
           }
@@ -2776,7 +2781,7 @@ void addsarea(struct uplname **chain, struct uplname *tempor, char *areaname, sh
   struct uplname *tareas = NULL, *ttareas = NULL;
   short tfound = 0;
 
-  mystrncpy(tempor->persarea, areaname, arealength);
+  mystrncpy(tempor->persarea, areaname, arealength - 1);
   tempor->where = where;
   tempor->found = 0;
   tempor->touched = 0;
@@ -3070,7 +3075,7 @@ short delkill(short deltype)
   nfoundd:
     if(tlist == NULL)
     {
-      mystrncpy(errname, token, toklen + 1);
+      tokencpy(errname, DirSize);
       errexit(5, __FILE__, __LINE__);
     }
     lseek(areaset, tlist->alist[i].areaoffs, SEEK_SET);
