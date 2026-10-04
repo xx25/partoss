@@ -227,7 +227,15 @@ int main(int argc, char **argv)
 
 
 #if defined (__linux__) || defined (__FreeBSD__)
-  realpath(argv[0], homedir);
+  {
+    // realpath() may write up to PATH_MAX bytes; homedir holds DirSize + 1
+    char *rpath = realpath(argv[0], NULL);
+    if(rpath)
+    {
+      mystrncpy(homedir, rpath, DirSize);
+      free(rpath);
+    }
+  }
 #else
   _fullpath(homedir, argv[0], DirSize);
 #endif

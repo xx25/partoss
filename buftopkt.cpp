@@ -626,7 +626,8 @@ endwork:
       mystrncat (oufn, (char *)".ouf", 6, DirSize);
       if ((ouf = (short)open (oufn, O_RDWR | O_BINARY)) == -1)
   {
-    if ((ouf = (short)open (oufn, O_RDWR | O_BINARY | O_CREAT)) == -1)
+    if ((ouf = (short)open (oufn, O_RDWR | O_BINARY | O_CREAT,
+				 S_IREAD | S_IWRITE)) == -1)
       {
         mystrncpy (errname, oufn, DirSize);
         errexit (2, __FILE__, __LINE__);

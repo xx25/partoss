@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <fcntl.h>
 #ifdef __EMX__
 #include <sys/types.h>
 #endif
@@ -22,7 +23,12 @@
 #define SH_DENYNO 0666
 #define SH_DENYRW 0666
 #define SH_DENYWR 0666
-#define sopen open
+// No share modes here: SH_DENY* is the creation mode, as it always was
+// when sopen was a plain #define of open (the 4th argument was ignored).
+static inline int sopen (const char *__path, int __access, int __share, ...)
+{
+  return open (__path, __access, __share);
+}
 
 #ifndef __EMX__
 extern char *strupr (char *__string);
