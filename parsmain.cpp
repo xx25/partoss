@@ -19,6 +19,25 @@
 #include "locks.h"
 #endif
 
+// Copy a config value of len characters into a field of size bytes
+static void cfgcpy(char *dest, const char *src, int len, int size)
+{
+  if(len < 0)
+    len = 0;
+  if(len > size - 1)
+    len = size - 1;
+  mystrncpy(dest, src, (unsigned short)len);   // writes len + 1 bytes
+}
+
+// Closing quote of a "..." value; the end of the line if it has none
+static char *endquote(char *temp, short level)
+{
+  char *temp2 = strchr(temp, '"');
+  if(temp2 == NULL || temp2 > ::string + maxstr[level])
+    temp2 = ::string + maxstr[level];
+  return temp2;
+}
+
 char *keywords[] = {
   "Address",                    //  0 Add to list of addresses
   "AddToSeen",                  //  1 Set variable addtoseen
@@ -491,7 +510,7 @@ void parser(char *file, short level)
           break;
         case 171:
           gettoken(level);
-          tokencpy((char *)&umaskstr, 32);
+          tokencpy((char *)&umaskstr, 31);
           umask_val = strtol((char *)&umaskstr, NULL, 8);
 //    printf("umask: %d & 0777 = %d\n",umask_val,(umask_val&777));
           break;
@@ -629,7 +648,7 @@ void parser(char *file, short level)
             tokencpy(bcfg.origin, 80);
           else
           {
-            mystrncpy(bcfg.origin, token, (short)(maxstr[level] - (token -::string)));
+            cfgcpy(bcfg.origin, token, maxstr[level] - (token -::string), sizeof(bcfg.origin));
             temp = strchr(bcfg.origin, '\r');
             if(temp)
               *temp = 0;
@@ -878,7 +897,7 @@ void parser(char *file, short level)
                   if(*temp == '"')
                   {
                     temp++;
-                    temp2 = strchr(temp, '"');
+                    temp2 = endquote(temp, level);
                     toklen = (short)(temp2 - token - 1);
                     curtpos[level] = (short)(temp2 -::string + 1);
                   }
@@ -889,7 +908,7 @@ void parser(char *file, short level)
                     isdescr = 1;
                   }
                   else
-                    mystrncpy(bcfg.areadesc, temp, (short)(toklen - 3));
+                    cfgcpy(bcfg.areadesc, temp, toklen - 3, sizeof(bcfg.areadesc));
                   break;
                 case 'f':
                 case 'F':
@@ -897,7 +916,7 @@ void parser(char *file, short level)
                   if(*temp == '"')
                   {
                     temp++;
-                    temp2 = strchr(temp, '"');
+                    temp2 = endquote(temp, level);
                     toklen = (short)(temp2 - token - 1);
                     curtpos[level] = (short)(temp2 -::string + 1);
                   }
@@ -907,14 +926,13 @@ void parser(char *file, short level)
                     mystrncpy(pool, temp, (short)(toklen - 3));
                     isdescr = 1;
                     pool[toklen - 2] = 0;
-                    if(pool[strlen(pool) - 1] != DIRSEP[0])
+                    if(pool[0] && pool[strlen(pool) - 1] != DIRSEP[0])
                       mystrncat(pool, DIRSEP, 3, DirSize);
                   }
                   else
                   {
-                    mystrncpy(bcfg.areapool, temp, (short)(toklen - 3));
-                    bcfg.areapool[toklen - 2] = 0;
-                    if(bcfg.areapool[strlen(bcfg.areapool) - 1] != DIRSEP[0])
+                    cfgcpy(bcfg.areapool, temp, toklen - 3, DirSize);   // room for DIRSEP
+                    if(bcfg.areapool[0] && bcfg.areapool[strlen(bcfg.areapool) - 1] != DIRSEP[0])
                       mystrncat(bcfg.areapool, (char *)DIRSEP, 3, DirSize);
                   }
                   ispool = 1;
@@ -1286,29 +1304,29 @@ void parser(char *file, short level)
                   break;
                 case '#':
                   blink.mask |= 4;
-                  mystrncpy(blink.echopass, token + 1, (short)(toklen - 1));
+                  cfgcpy(blink.echopass, token + 1, toklen - 1, sizeof(blink.echopass));
                   break;
                 case '$':
                   if(token[1] == '-')
                   {
                     blink.mask |= 8;
-                    mystrncpy(blink.rog, token + 2, (short)(toklen - 2));
+                    cfgcpy(blink.rog, token + 2, toklen - 2, sizeof(blink.rog));
                   }
                   else
                   {
                     blink.mask |= 16;
-                    mystrncpy(blink.group, token + 1, (short)(toklen - 1));
+                    cfgcpy(blink.group, token + 1, toklen - 1, sizeof(blink.group));
                   };
                   break;
                 case '&':
                   blink.mask |= 32;
-                  mystrncpy(blink.packer, token + 1, (short)(toklen - 1));
+                  cfgcpy(blink.packer, token + 1, toklen - 1, sizeof(blink.packer));
                   break;
                 case '!':
                   blink.mask |= 64;
                   blink.autoadd = 1;
                   if(toklen > 1)
-                    memcpy(blink.crmask, token + 1, (short)(toklen - 1));
+                    cfgcpy(blink.crmask, token + 1, toklen - 1, sizeof(blink.crmask));
                   else
                     memcpy(blink.crmask, "*", 1);
                   break;
@@ -1322,11 +1340,11 @@ void parser(char *file, short level)
                   if(*temp == '"')
                   {
                     temp++;
-                    temp2 = strchr(temp, '"');
+                    temp2 = endquote(temp, level);
                     toklen = (short)(temp2 - token - 1);
                     curtpos[level] = (unsigned short)(temp2 -::string + 1);
                   }
-                  mystrncpy(blink.name, temp, (short)(toklen - 1));
+                  cfgcpy(blink.name, temp, toklen - 1, sizeof(blink.name));
                   break;
                 case '?':
                   blink.mask |= 512;
@@ -1565,7 +1583,7 @@ void parser(char *file, short level)
 
         case 50:
           gettoken(level);
-          tokencpy(bcfg.mandesc, toklen);
+          tokencpy(bcfg.mandesc, DirSize);
           break;
 
         case 51:
@@ -1809,7 +1827,7 @@ void parser(char *file, short level)
             tokencpy(bcfg.fwdstr, BufSize);
           else
           {
-            mystrncpy(bcfg.fwdstr, token, (short)(maxstr[level] - (token -::string)));
+            cfgcpy(bcfg.fwdstr, token, maxstr[level] - (token -::string), sizeof(bcfg.fwdstr));
             temp = strchr(bcfg.fwdstr, '\r');
             if(temp)
               *temp = 0;
@@ -1883,7 +1901,7 @@ void parser(char *file, short level)
               {
                 tdn->group = 1;
                 gettoken(level);
-                tokencpy(tdn->where, (short)(toklen > 52 ? 52 : toklen));
+                tokencpy(tdn->where, sizeof(tdn->where) - 1);
               }
               else
               {
@@ -1891,7 +1909,7 @@ void parser(char *file, short level)
                 if(strnicmp(token + 1, "%All", 4) == 0)
                   mystrncpy(tdn->where, "*", 39);
                 else
-                  mystrncpy(tdn->where, token + 1, (short)((toklen > arealength ? arealength : toklen) - 1));
+                  cfgcpy(tdn->where, token + 1, toklen - 1, sizeof(tdn->where));
               }
               break;
             case '$':
@@ -2044,10 +2062,10 @@ void parser(char *file, short level)
             switch (token[0])
             {
             case '#':
-              mystrncpy(bladv.persarea, token + 1, (short)(toklen - 1));
+              cfgcpy(bladv.persarea, token + 1, toklen - 1, sizeof(bladv.persarea));
               break;
             case '$':
-              mystrncpy(bladv.echolist, token + 1, (short)(toklen - 1));
+              cfgcpy(bladv.echolist, token + 1, toklen - 1, sizeof(bladv.echolist));
               k = (short)strlen(bladv.echolist);
               if(bladv.echolist[k - 1] != DIRSEP[0])
               {

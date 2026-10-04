@@ -11,6 +11,15 @@
 #include "archives.h"
 #include "environ.h"
 
+// Rest of the current line from token, cut to size characters
+static unsigned short restlen (unsigned short size)
+{
+  long len = maxstr[0] - (token - ::string);
+  if (len < 0)
+    len = 0;
+  return (unsigned short)((len > size) ? size : len);
+}
+
 char *arckeys[] = {
   "Archiver",
   "Extension",
@@ -182,8 +191,7 @@ void runcompset (void)
       gettoken (0);
       if (!left)
         {
-          mystrncpy (pack.add, token,
-         (short)(maxstr[0] - (token - ::string)));
+          mystrncpy (pack.add, token, restlen (CSSize));
           temp = strchr (token, '.');
           if (temp && ((temp - token) < toklen))
 #if defined( __DOS__ )
@@ -204,8 +212,7 @@ void runcompset (void)
         {
           if (!radd)
       {
-        mystrncpy (pack.add, token,
-             (short)(maxstr[0] - (token - ::string)));
+        mystrncpy (pack.add, token, restlen (CSSize));
         temp = strchr (token, '.');
         if (temp && ((temp - token) < toklen))
 #if defined( __DOS__ )
@@ -228,8 +235,7 @@ void runcompset (void)
       gettoken (0);
       if (!left)
         {
-          mystrncpy (pack.extr, token,
-         (short)(maxstr[0] - (token - ::string)));
+          mystrncpy (pack.extr, token, restlen (CSSize));
           temp = strchr (token, '.');
           if (temp && ((temp - token) < toklen))
 #if defined( __DOS__ )
@@ -250,8 +256,7 @@ void runcompset (void)
         {
           if (!rextr)
       {
-        mystrncpy (pack.extr, token,
-             (short)(maxstr[0] - (token - ::string)));
+        mystrncpy (pack.extr, token, restlen (CSSize));
         temp = strchr (token, '.');
         if (temp && ((temp - token) < toklen))
 #if defined( __DOS__ )
