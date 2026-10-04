@@ -859,13 +859,14 @@ char *mystrncat (char *dest, const char *src, unsigned short len,
 
 short rrename (char *from, char *to)
 {
-  short result, i, len, terr;
+  short result, i, terr;
   char da, db;
   da = db = ' ';
-  len = (short)strlen (from);
-  if (len < strlen (to))
-    len = (short)strlen (to);
-  if (memicmp (from, to, len))
+#if defined(__linux__) || defined(__FreeBSD__)
+  if (strcmp (from, to))        // names differing in case are different files
+#else
+  if (stricmp (from, to))
+#endif
     {
       unlink (to);
       if (from[1] == ':')

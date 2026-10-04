@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <fcntl.h>
+#include <ctype.h>
 #ifdef __EMX__
 #include <sys/types.h>
 #endif
@@ -16,7 +17,17 @@
 #define strnicmp strncasecmp
 #define strcmpi strcasecmp
 #define stricmp strcasecmp
-#define memicmp bcmp
+// bcmp is case-sensitive; memicmp is not
+static inline int memicmp (const void *__s1, const void *__s2, size_t __n)
+{
+  const unsigned char *__p1 = (const unsigned char *)__s1;
+  const unsigned char *__p2 = (const unsigned char *)__s2;
+  int __d;
+  for (; __n; __n--, __p1++, __p2++)
+    if ((__d = toupper (*__p1) - toupper (*__p2)) != 0)
+      return __d;
+  return 0;
+}
 
 #define cprintf printf
 

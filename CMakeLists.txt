@@ -12,6 +12,8 @@ SET(p_sources archives.cpp attach.cpp buftomsg.cpp
 )
 ADD_DEFINITIONS(-D_GNU_SOURCE -D_BSD_SOURCE)
 IF(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # char is unsigned with the DOS/OS2 compilers; CP866 text depends on it
+  ADD_DEFINITIONS(-funsigned-char)
   ADD_DEFINITIONS(-fstack-protector-strong -D_FORTIFY_SOURCE=2)
 ENDIF()
 ADD_EXECUTABLE(partoss ${p_sources})
