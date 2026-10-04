@@ -403,6 +403,8 @@ void runmainset(void)
   }
   chsize(areapool, 0);
   lseek(areapool, 0, SEEK_SET);
+  // pooloffs 0 means "no pool", so no pool may start at offset 0
+  wwrite(areapool, (void *)"", 1, __FILE__, __LINE__);
   memset(&defaddr, 0, szmyaddr);
   mystrncpy(bcfg.creatfile, mainconf, DirSize);
   parser(mainconf, 0);

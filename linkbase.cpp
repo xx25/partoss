@@ -300,7 +300,9 @@ long readmsg (long number, short type)
       temp2++;
     temp--;
     memset (tmsgid, 0, 80);
-    memcpy (tmsgid, temp + 7, (unsigned)(temp2 - temp - 7));
+    memcpy (tmsgid, temp + 7,
+      (unsigned)(((temp2 - temp - 7) >
+            79) ? 79 : (temp2 - temp - 7)));
     tmsgid = strupr (tmsgid);
     reply[(unsigned)number] =
       crc32block (tmsgid, (short)strlen (tmsgid));

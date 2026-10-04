@@ -409,9 +409,9 @@ void buftopkt (short type)
         fakeorigin (fake, tbuf, fmax2);
         if (type < 3)
         {
-           temp = locseenby (tbuf);
+           temp = locseenby (tbuf, 0);
            if ((bcfg.delinfo == 2) && (temp == NULL))
-              temp = locpath (tbuf);
+              temp = locpath (tbuf, 0);
         };
         if (temp == NULL || type > 2)
     {

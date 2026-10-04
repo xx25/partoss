@@ -208,7 +208,7 @@ gooddt:
 	    tpos = 0;
 	  lseek (temppkt, -tpos, SEEK_END);
 	  rreadz (temppkt, pktbuf, (unsigned short)(tpos), __FILE__, __LINE__);
-	  temp = locseenby (pktbuf);
+	  temp = locseenby (pktbuf, (short)(tpos < buflen));
 	  if (temp && ((temp - pktbuf) < tpos))
 	    pcmsglen = pmsglen - (tpos - (temp - pktbuf));
 	  else

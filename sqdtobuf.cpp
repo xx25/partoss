@@ -209,7 +209,8 @@ short sqdtobuf (struct area *ttarea, struct sqifile *tindex, long number)
 		  if (temp || fmax2 < buflen)
 		    {
 		      endmsg = 1;
-		      j = (short)(temp - sqdbuf);
+		      // short read without a NUL: take all of it
+		      j = (short)(temp ? (temp - sqdbuf) : fmax2);
 		    }
 		  else
 		    {
@@ -234,7 +235,7 @@ short sqdtobuf (struct area *ttarea, struct sqifile *tindex, long number)
 	    tpos = buflen;
 	  lseek (tempsqd, -tpos, SEEK_END);
 	  rreadz (tempsqd, sqdbuf, buflen, __FILE__, __LINE__);
-	  temp = locseenby (sqdbuf);
+	  temp = locseenby (sqdbuf, (short)(tpos < buflen));
 	  if (temp)
 	    scmsglen = smsglen - (buflen - (temp - sqdbuf));	// +skludlen;
 	  else

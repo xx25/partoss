@@ -506,14 +506,14 @@ short buftosqd (struct area *ttarea, struct sqifile *tindex, short type)
         switch (bcfg.delinfo)
     {
     case 1:
-      temp = locseenby (tsbuf);
+      temp = locseenby (tsbuf, 0);
       break;
     case 2:
-      temp = locpath (tsbuf);
+      temp = locpath (tsbuf, 0);
       if (temp != NULL)
         temp = strchr (temp, 0);
       else
-        temp = locseenby (tsbuf);
+        temp = locseenby (tsbuf, 0);
       break;
     }
 //          else

@@ -120,16 +120,18 @@ void readchain (short type, short subtype)
     }
 }
 
-char *locseenby (char *buf)
+// bolstart: buf itself is at the start of a line (message text), not a
+// block read from the middle of one
+char *locseenby (char *buf, short bolstart)
 {
   char *temp = NULL, *temp2 = NULL;
   temp = strstr (buf, "SEEN-BY: ");
   while (temp)
     {
-      temp2 = temp - 1;
-      while (temp2 >= buf && (*temp2 == '\n'))
+      temp2 = temp;
+      while (temp2 > buf && (temp2[-1] == '\n'))
   temp2--;
-      if (temp2 < buf || (*temp2 == '\r'))
+      if (temp2 > buf ? (temp2[-1] == '\r') : bolstart)
   return temp;
       temp2 = temp + 1;
       temp = strstr (temp2, "SEEN-BY: ");
@@ -137,16 +139,16 @@ char *locseenby (char *buf)
   return NULL;
 }
 
-char *locpath (char *buf)
+char *locpath (char *buf, short bolstart)
 {
   char *temp = NULL, *temp2 = NULL;
   temp = strstr (buf, "\1PATH: ");
   while (temp)
     {
-      temp2 = temp - 1;
-      while (temp2 >= buf && (*temp2 == '\n'))
+      temp2 = temp;
+      while (temp2 > buf && (temp2[-1] == '\n'))
   temp2--;
-      if (temp2 < buf || (*temp2 == '\r'))
+      if (temp2 > buf ? (temp2[-1] == '\r') : bolstart)
   return temp;
       temp2 = temp + 1;
       temp = strstr (temp2, "\1PATH: ");
