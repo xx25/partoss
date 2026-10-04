@@ -108,7 +108,7 @@ void scanbase (char *arealist, short type)  // 1 - scan, 2 - link, 3 - purge, 4 
         for (carea = 0; carea < tlist->numlists; carea++)
     if (wildcard (arealist, tlist->alist[carea].areaname) == 0)
     {
-      sprintf (logout, "Scanning area %s", tlist->alist[carea].areaname);
+      logprintf ("Scanning area %s", tlist->alist[carea].areaname);
       logwrite (1, 9);
       scanarea (tlist->alist[carea].areaoffs, type);
     }
@@ -148,7 +148,7 @@ void scanbase (char *arealist, short type)  // 1 - scan, 2 - link, 3 - purge, 4 
         && strlen (tlist->alist[carea].areaname) ==
         toklen)
             {
-        sprintf (logout, "Scanning area %s", tlist->alist[carea].areaname);
+        logprintf ("Scanning area %s", tlist->alist[carea].areaname);
         logwrite (1, 5);
         scanarea (tlist->alist[carea].areaoffs, type);
         goto nfound2;
@@ -170,10 +170,10 @@ void scanbase (char *arealist, short type)  // 1 - scan, 2 - link, 3 - purge, 4 
   if (type == 3 && globold && globnew)
     {
       if (globold < 1024)
-  sprintf (logout, "Total compressing: %ldb -> %ldb, %d%%",
+  logprintf ("Total compressing: %ldb -> %ldb, %d%%",
      globold, globnew, (globnew * 100) / globold);
       else
-  sprintf (logout, "Total compressing: %ldK -> %ldK, %d%%",
+  logprintf ("Total compressing: %ldK -> %ldK, %d%%",
      globold >> 10, globnew >> 10,
      /*(globnew*100)/globold */ globnew / (globold / 100));
       if (bcfg.loglevel)
@@ -328,7 +328,7 @@ void scansqd (void)
   }
       if ((maxmsg - pfirst) > 0)
   {
-    sprintf (logout, "%-60s (%ld - %ld)", newarea->areaname, pfirst + 1,
+    logprintf ("%-60s (%ld - %ld)", newarea->areaname, pfirst + 1,
        maxmsg);
     logwrite (1, 5);
   }
@@ -377,7 +377,7 @@ void scanmsg (void)
   short topack, nomore, msg;
   char tmpfile[(DirSize + 1)], tfile[(DirSize + 1)];
   struct find_t fblk;
-  sprintf (logout, "%-60s", newarea->areaname);
+  logprintf ("%-60s", newarea->areaname);
   if (!quiet)
     ccprintf ("%s\r\n", logout);
   logwrite (1, 5);

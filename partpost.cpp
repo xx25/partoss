@@ -354,10 +354,10 @@ short poster (short type)
 		      if (tfile != -1)
 			{
 			  waspost = 1;
-			  sprintf (logout, "Post message to area %s",
+			  logprintf ("Post message to area %s",
 				   newarea->areaname);
 			  logwrite (1, 4);
-			  sprintf (logout, "Message's Subj is \"%s\"",
+			  logprintf ("Message's Subj is \"%s\"",
 				   bufpkt.subj);
 			  logwrite (1, 6);
 			  if (!netmail)
@@ -370,7 +370,7 @@ short poster (short type)
 			      pckludge =
 				(struct kludge *)myalloc (szkludge, __FILE__,
 							  __LINE__);
-			      sprintf (logout, "\1MSGID: %u:%u/%u.%u %s",
+			      logprintf ("\1MSGID: %u:%u/%u.%u %s",
 				       bufpkt.fromzone, bufpkt.fromnet,
 				       bufpkt.fromnode, bufpkt.frompoint,
 				       msgid);
@@ -394,13 +394,13 @@ short poster (short type)
 			  if (isorig || !netmail)
 			    {
 			      if (bufpkt.frompoint)
-				sprintf (logout,
+				logprintf (
 					 " * Origin: %s (%u:%u/%u.%u)\r",
 					 isorig ? orig : bcfg.origin,
 					 bufpkt.fromzone, bufpkt.fromnet,
 					 bufpkt.fromnode, bufpkt.frompoint);
 			      else
-				sprintf (logout, " * Origin: %s (%u:%u/%u)\r",
+				logprintf (" * Origin: %s (%u:%u/%u)\r",
 					 isorig ? orig : bcfg.origin,
 					 bufpkt.fromzone, bufpkt.fromnet,
 					 bufpkt.fromnode);
@@ -452,7 +452,7 @@ short poster (short type)
 				      __FILE__, __LINE__);
 			      lseek (tempsqd, 0, SEEK_SET);
 			      while ((fmax2 =
-				      (short)rread (tempsqd, sqdbuf, buflen,
+				      (short)rreadz (tempsqd, sqdbuf, buflen,
 						    __FILE__, __LINE__)) != 0)
 				wwrite (temppkt, sqdbuf, fmax2, __FILE__,
 					__LINE__);
@@ -536,7 +536,7 @@ short poster (short type)
 			}
 		      else
 			{
-			  sprintf (logout, "POST failed: file %s not found",
+			  logprintf ("POST failed: file %s not found",
 				   hfile);
 			  logwrite (1, 6);
 			}

@@ -34,7 +34,7 @@ short sqdtobuf (struct area *ttarea, struct sqifile *tindex, long number)
   rread (ttarea->sqd.sqd, &head, 266, __FILE__, __LINE__);
   if (head.ident != 0xAFAE4453L)
     {
-      sprintf (logout,
+      logprintf (
 	       "??? Area %s is damaged or index file is corrupted (# %u)",
 	       ttarea->areaname, number);
       if (logfileok)
@@ -142,7 +142,7 @@ short sqdtobuf (struct area *ttarea, struct sqifile *tindex, long number)
       if (smsglen < buflen)
 	{
 	  fmax2 =
-	    (unsigned short)rread (ttarea->sqd.sqd, sqdbuf,
+	    (unsigned short)rreadz (ttarea->sqd.sqd, sqdbuf,
 				   (unsigned short)(smsglen + 1), __FILE__,
 				   __LINE__);
 	  if (gheadclen && (strlen (sqdbuf) < (gheadclen - 1)))
@@ -182,7 +182,7 @@ short sqdtobuf (struct area *ttarea, struct sqifile *tindex, long number)
 	  wwrite (tempsqd, bufsqd.subj, (unsigned short)(ssubjlen + 1),
 		  __FILE__, __LINE__);
 	  fmax2 =
-	    (unsigned short)rread (ttarea->sqd.sqd, sqdbuf, buflen, __FILE__,
+	    (unsigned short)rreadz (ttarea->sqd.sqd, sqdbuf, buflen, __FILE__,
 				   __LINE__);
 	  if (gheadclen && (strlen (sqdbuf) < (gheadclen - 1)))
 	    gheadclen = (short)(strlen (sqdbuf) + 1);
@@ -201,7 +201,7 @@ short sqdtobuf (struct area *ttarea, struct sqifile *tindex, long number)
 	    {
 	      lseek (ttarea->sqd.sqd, soffset, SEEK_SET);
 	      fmax2 =
-		(unsigned short)rread (ttarea->sqd.sqd, sqdbuf, buflen,
+		(unsigned short)rreadz (ttarea->sqd.sqd, sqdbuf, buflen,
 				       __FILE__, __LINE__);
 	      if (fmax2)
 		{
@@ -233,7 +233,7 @@ short sqdtobuf (struct area *ttarea, struct sqifile *tindex, long number)
 	  if (tpos > buflen)
 	    tpos = buflen;
 	  lseek (tempsqd, -tpos, SEEK_END);
-	  rread (tempsqd, sqdbuf, buflen, __FILE__, __LINE__);
+	  rreadz (tempsqd, sqdbuf, buflen, __FILE__, __LINE__);
 	  temp = locseenby (sqdbuf);
 	  if (temp)
 	    scmsglen = smsglen - (buflen - (temp - sqdbuf));	// +skludlen;
@@ -296,7 +296,7 @@ short sqhtobuf (long number)
   rread (newarea->sqd.sqd, &head, 266, __FILE__, __LINE__);
   if (head.ident != 0xAFAE4453L)
     {
-      sprintf (logout,
+      logprintf (
 	       "??? Area %s is damaged or index file is corrupted (# %u)",
 	       newarea->areaname, number);
       if (logfileok)

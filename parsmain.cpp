@@ -256,7 +256,7 @@ void runmainset(void)
           errexit(14, __FILE__, __LINE__);
         else if(lich)
         {
-          sprintf(logout, "Waiting for open/create %s", cfname);
+          logprintf("Waiting for open/create %s", cfname);
           logwrite(1, 1);
         }
         mtsleep(5);
@@ -310,7 +310,7 @@ void runmainset(void)
       case -1:
         if(lich)
         {
-          sprintf(logout, "Waiting for open/create %s", cfname);
+          logprintf("Waiting for open/create %s", cfname);
           logwrite(1, 1);
         }
         mtsleep(5);
@@ -349,7 +349,7 @@ void runmainset(void)
       case -1:
         if(lich)
         {
-          sprintf(logout, "Waiting for open/create %s", cfname);
+          logprintf("Waiting for open/create %s", cfname);
           logwrite(1, 1);
         }
         mtsleep(5);
@@ -388,7 +388,7 @@ void runmainset(void)
       case -1:
         if(lich)
         {
-          sprintf(logout, "Waiting for open/create %s", cfname);
+          logprintf("Waiting for open/create %s", cfname);
           logwrite(1, 1);
         }
         mtsleep(5);
@@ -1068,7 +1068,7 @@ void parser(char *file, short level)
                     mywrite(edlist, "-$", __FILE__, __LINE__);
                   break;
                 case 'G':
-                  sprintf(logout, "%c", ttarea1->group);
+                  logprintf("%c", ttarea1->group);
                   mywrite(edlist, logout, __FILE__, __LINE__);
                   break;
                 case 'D':
@@ -1088,7 +1088,7 @@ void parser(char *file, short level)
                   mywrite(edlist, "\"", __FILE__, __LINE__);
                   break;
                 case 'A':
-                  sprintf(logout, "%u:%u/%u.%u",
+                  logprintf("%u:%u/%u.%u",
                           ttarea1->myaka.zone, ttarea1->myaka.net, ttarea1->myaka.node, ttarea1->myaka.point);
                   mywrite(edlist, logout, __FILE__, __LINE__);
                   break;
@@ -1771,7 +1771,7 @@ void parser(char *file, short level)
             tokencpy(logout, DirSize);
             addhome(tincl->name, logout);
             bcfg.numincl++;
-            sbuffer[1] = (char *)myalloc(4096, __FILE__, __LINE__);
+            sbuffer[1] = (char *)myalloc(4097, __FILE__, __LINE__);
             parser(tincl->name, level + 1);
             mystrncpy(confile, hfile, DirSize);
             myfree((void **)&(sbuffer[1]), __FILE__, __LINE__);

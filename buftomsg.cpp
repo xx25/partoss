@@ -213,30 +213,30 @@ nfound:
       hexascii (times, strtimes);
       mystrncpy (msgid, strtimes, 8);
       msgid[8] = 0;
-      sprintf (logout, "\1MSGID: %u:%u/%u.%u %s\r", bfromzone,
+      logprintf ("\1MSGID: %u:%u/%u.%u %s\r", bfromzone,
 	       bufmsg.fromnet, bufmsg.fromnode, bfrompoint, msgid);
       mywrite (msg, logout, __FILE__, __LINE__);
       if (bcfg.fintl || (bfromzone != btozone))
 	{
-	  sprintf (logout, "\1INTL %u:%u/%u %u:%u/%u\r", btozone,
+	  logprintf ("\1INTL %u:%u/%u %u:%u/%u\r", btozone,
 		   bufmsg.tonet, bufmsg.tonode, bfromzone, bufmsg.fromnet,
 		   bufmsg.fromnode);
 	  mywrite (msg, logout, __FILE__, __LINE__);
 	}
       if (bfrompoint)
 	{
-	  sprintf (logout, "\1FMPT %u\r", bfrompoint);
+	  logprintf ("\1FMPT %u\r", bfrompoint);
 	  mywrite (msg, logout, __FILE__, __LINE__);
 	}
       if (btopoint)
 	{
-	  sprintf (logout, "\1TOPT %u\r", btopoint);
+	  logprintf ("\1TOPT %u\r", btopoint);
 	  mywrite (msg, logout, __FILE__, __LINE__);
 	}
     }
   if (type == 4 && setdir)
     {
-      sprintf (logout, "\1FLAGS DIR\r");
+      logprintf ("\1FLAGS DIR\r");
       mywrite (msg, logout, __FILE__, __LINE__);
     }
   tkludge = mckludge;
@@ -277,7 +277,7 @@ nfound:
   if (mbigmess)
     {
       while ((fmax2 =
-	      (unsigned short)rread (tempmsg, type == 4 ? sqdbuf : pktbuf,
+	      (unsigned short)rreadz (tempmsg, type == 4 ? sqdbuf : pktbuf,
 				     buflen, __FILE__, __LINE__)) != 0)
 	{
 	  fakeorigin (fake, type == 4 ? sqdbuf : pktbuf, fmax2);

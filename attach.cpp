@@ -79,7 +79,7 @@ void makeattach (short type)
       tpack = pkts;
       while (tpack)
   {
-    sprintf (logout, "Packet %s - ", tpack->name);
+    logprintf ("Packet %s - ", tpack->name);
     if ((!tpack->sent) && (type == 0 || tpack->filled)
         && (tpack->touched))
       mystrncat (logout, "must be sent", 15, DirSize);
@@ -189,7 +189,7 @@ void makeattach (short type)
         busy = 1;
         if (bcfg.loglevel > 10)
           {
-            sprintf (logout,
+            logprintf (
                "Bink busy flag %s for %u:%u/%u.%u detected",
                binkname, tpack->outaddr.zone,
                tpack->outaddr.net,
@@ -211,7 +211,7 @@ void makeattach (short type)
             busy = 1;
             if (bcfg.loglevel > 10)
         {
-          sprintf (logout,
+          logprintf (
              "Bink busy flag %s for %u:%u/%u.%u detected",
              binkname, tpack->outaddr.zone,
              tpack->outaddr.net,
@@ -251,7 +251,7 @@ void makeattach (short type)
         _dos_findclose (&fblk);
         if (bcfg.loglevel > 10)
           {
-            sprintf (logout,
+            logprintf (
                "FD busy flag %s\\%s for %u:%u/%u.%u detected",
                bcfg.busy, flname, tpack->outaddr.zone,
                tpack->outaddr.net,
@@ -279,7 +279,7 @@ void makeattach (short type)
         busy = 1;
         if (bcfg.loglevel > 10)
           {
-            sprintf (logout,
+            logprintf (
                "Bink busy flag %s for %u:%u/%u.%u create failed",
                bsyname, tpack->outaddr.zone,
                tpack->outaddr.net,
@@ -314,7 +314,7 @@ void makeattach (short type)
         busy = 1;
         if (bcfg.loglevel > 10)
           {
-            sprintf (logout,
+            logprintf (
                "FD busy flag %s for %u:%u/%u.%u create failed",
                bsynamef, tpack->outaddr.zone,
                tpack->outaddr.net,
@@ -339,7 +339,7 @@ void makeattach (short type)
           if (hexstyle == 10)
       {
         memset (logout, 0, BufSize);
-        sprintf (logout, "%u:%u/%u.%u~%u:%u/%u.%u",
+        logprintf ("%u:%u/%u.%u~%u:%u/%u.%u",
            tpack->fromaddr.zone, tpack->fromaddr.net,
            tpack->fromaddr.node,
            tpack->fromaddr.point, tpack->outaddr.zone,
@@ -597,7 +597,7 @@ void makeattach (short type)
             SetConsoleTitle(logout);
 #endif
           }
-        sprintf (logout, "Pack %s to %s", tmpname, boxname);
+        logprintf ("Pack %s to %s", tmpname, boxname);
         logwrite (1, 9);
         packerr = archiver (boxname, tmpname, 2);
         if (bcfg.sap[0])
@@ -662,7 +662,7 @@ void makeattach (short type)
           SetConsoleTitle(logout);
 #endif
         }
-            sprintf (logout, "Pack %s to %s", tmpname, arcname);
+            logprintf ("Pack %s to %s", tmpname, arcname);
             logwrite (1, 9);
             packerr = archiver (arcname, tmpname, 2);
             if (bcfg.sap[0])
@@ -777,7 +777,7 @@ void makeattach (short type)
           SetConsoleTitle(logout);
 #endif
         }
-            sprintf (logout, "Pack %s to %s", tmpname, binkname);
+            logprintf ("Pack %s to %s", tmpname, binkname);
             logwrite (1, 9);
             packerr = archiver (binkname, tmpname, 2);
             if (bcfg.sap[0])
@@ -899,7 +899,7 @@ void makeattach (short type)
           {
             if (lich)
               {
-                sprintf (logout,
+                logprintf (
                    "Waiting for open %s",
                    badname);
                 logwrite (1, 1);
@@ -968,7 +968,7 @@ void makeattach (short type)
           case EACCES:
             if (lich)
               {
-          sprintf (logout,
+          logprintf (
              "Waiting for open/create %s",
              binkname);
           logwrite (1, 1);

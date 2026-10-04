@@ -88,7 +88,7 @@ void runcompset (void)
       case EACCES:
         if (lich)
     {
-      sprintf (logout, "Waiting for open/create %s", cfname);
+      logprintf ("Waiting for open/create %s", cfname);
       logwrite (1, 1);
     }
         mtsleep (5);

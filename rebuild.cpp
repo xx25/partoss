@@ -275,11 +275,11 @@ dowork:
     globold += oldsize;
     globnew += newsize;
     if (oldsize < 1024)
-      sprintf (logout, "Purge %s: %ld -> %ld (%ldb -> %ldb, %d%%)",
+      logprintf ("Purge %s: %ld -> %ld (%ldb -> %ldb, %d%%)",
          newarea->areaname, maxmsg, newmess, oldsize, newsize,
          (newsize * 100) / oldsize);
     else
-      sprintf (logout, "Purge %s: %ld -> %ld (%ldK -> %ldK, %d%%)",
+      logprintf ("Purge %s: %ld -> %ld (%ldK -> %ldK, %d%%)",
          newarea->areaname, maxmsg, newmess, oldsize >> 10,
          newsize >> 10,
          /*(newsize*100)/oldsize */ newsize / (oldsize / 100));
@@ -430,7 +430,7 @@ void tossbad (void)
   setbadarea ();
   if (badlocked)
     {
-      sprintf (logout, "??? Tossing from Bad Area is impossible");
+      logprintf ("??? Tossing from Bad Area is impossible");
       logwrite (1, 4);
       return;
     }
@@ -518,7 +518,7 @@ void tossbad (void)
     totbad++;
     if (badarea > 0 && (bcfg.locked == 4))
       {
-        sprintf (logout, "BackUp: Area %s is locked");
+        logprintf ("BackUp: Area %s is locked");
         logwrite (1, 3);
         backup (1);
       }
@@ -530,7 +530,7 @@ void tossbad (void)
     badtype = 5;
         if (badlocked)
     {
-      sprintf (logout, "BackUp: BadArea is locked");
+      logprintf ("BackUp: BadArea is locked");
       logwrite (1, 3);
       backup (1);
     }
@@ -550,7 +550,7 @@ void tossbad (void)
       wipearea = 0;
       if (dupelocked)
         {
-          sprintf (logout, "BackUp: DupeArea is locked");
+          logprintf ("BackUp: DupeArea is locked");
           logwrite (1, 3);
           backup (1);
         }
@@ -576,7 +576,7 @@ void tossbad (void)
             badtype=3;
             if(badlocked)
              {
-              sprintf(logout,"BackUp: BadArea is locked");
+              logprintf("BackUp: BadArea is locked");
               logwrite(1,3);
               backup(1);
              }
@@ -598,7 +598,7 @@ void tossbad (void)
                 wipearea=0;
                 if(dupelocked)
                  {
-                  sprintf(logout,"BackUp: DupeArea is locked");
+                  logprintf("BackUp: DupeArea is locked");
                   logwrite(1,3);
                   backup(1);
                  }
@@ -630,7 +630,7 @@ void tossbad (void)
               wipearea=0;
               if(dupelocked)
                {
-                sprintf(logout,"BackUp: DupeArea is locked");
+                logprintf("BackUp: DupeArea is locked");
                 logwrite(1,3);
                 backup(1);
                }
@@ -658,7 +658,7 @@ void tossbad (void)
                 wipearea=0;
                 if(dupelocked)
                  {
-                  sprintf(logout,"BackUp: DupeArea is locked");
+                  logprintf("BackUp: DupeArea is locked");
                   logwrite(1,3);
                   backup(1);
                  }
@@ -677,7 +677,7 @@ void tossbad (void)
             badtype=4;
             if(badlocked)
              {
-              sprintf(logout,"BackUp: BadArea is locked");
+              logprintf("BackUp: BadArea is locked");
               logwrite(1,3);
               backup(1);
              }
@@ -758,23 +758,23 @@ void untoss (void)
       if (sbigmess)
   {
     lseek (tempsqd, 0, SEEK_SET);
-    rread (tempsqd, sqdbuf, (unsigned short)(stolen + 1), __FILE__,
+    rreadz (tempsqd, sqdbuf, (unsigned short)(stolen + 1), __FILE__,
      __LINE__);
     mywrite (bcurr, "To: ", __FILE__, __LINE__);
     mywrite (bcurr, sqdbuf, __FILE__, __LINE__);
     mywrite (bcurr, "\r", __FILE__, __LINE__);
-    rread (tempsqd, sqdbuf, (unsigned short)(sfromlen + 1), __FILE__,
+    rreadz (tempsqd, sqdbuf, (unsigned short)(sfromlen + 1), __FILE__,
      __LINE__);
     mywrite (bcurr, "From: ", __FILE__, __LINE__);
     mywrite (bcurr, sqdbuf, __FILE__, __LINE__);
     mywrite (bcurr, "\r", __FILE__, __LINE__);
-    rread (tempsqd, sqdbuf, (unsigned short)(ssubjlen + 1), __FILE__,
+    rreadz (tempsqd, sqdbuf, (unsigned short)(ssubjlen + 1), __FILE__,
      __LINE__);
     mywrite (bcurr, "Subj: ", __FILE__, __LINE__);
     mywrite (bcurr, sqdbuf, __FILE__, __LINE__);
     mywrite (bcurr, "\r\r", __FILE__, __LINE__);
     while ((fmax2 =
-      (unsigned short)rread (tempsqd, sqdbuf, buflen, __FILE__,
+      (unsigned short)rreadz (tempsqd, sqdbuf, buflen, __FILE__,
            __LINE__)) != 0)
       {
         temp = strstr (sqdbuf, "\rSEEN-BY: ");

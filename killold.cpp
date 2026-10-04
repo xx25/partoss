@@ -61,7 +61,7 @@ void killold (void)
 	      memset (shname, 0, 16);
 	      // hexstyle==10
 	      memset (logout, 0, BufSize);
-	      sprintf (logout, "%u:%u/%u.%u~%u:%u/%u.%u", link->zone,
+	      logprintf ("%u:%u/%u.%u~%u:%u/%u.%u", link->zone,
 		       link->net, link->node, link->point,
 		       blink->address.zone, blink->address.net,
 		       blink->address.node, blink->address.point);
@@ -303,7 +303,7 @@ short kill (char *tmpname, short boxes, struct link *blink)
   mystrncpy (arcname, tmpname, DirSize);
   mystrncat (arcname, shname, 16, DirSize);
   mystrncat (arcname, ".???", 5, DirSize);
-  sprintf (logout, "Search %s (%u:%u/%u.%u)", arcname, blink->address.zone,
+  logprintf ("Search %s (%u:%u/%u.%u)", arcname, blink->address.zone,
 	   blink->address.net, blink->address.node, blink->address.point);
   logwrite (1, 12);
   for (ii = 0; ii < 7; ii++)
@@ -330,7 +330,7 @@ short kill (char *tmpname, short boxes, struct link *blink)
 		    (unsigned short)((((fblk.wr_date & 0xfe00) >> 9) + 1980));
 		  fmonth = (unsigned short)(((fblk.wr_date & 0x1e0) >> 5));
 		  fday = (unsigned short)((fblk.wr_date & 0x1f));
-		  sprintf (logout, "%s (%u %s %u) - %ld bytes\r\n", fblk.name,
+		  logprintf ("%s (%u %s %u) - %ld bytes\r\n", fblk.name,
 			   fday, months[fmonth - 1], fyear, fblk.size);
 		  mywrite (zfile, logout, __FILE__, __LINE__);
 		  unlink (badname);
@@ -401,7 +401,7 @@ short kill (char *tmpname, short boxes, struct link *blink)
 			    (short)_dos_findfirst (binkname, findattr, &tblk);
 			  if (i == 0)
 			    {
-			      sprintf (logout, "Try to clean %s from %s",
+			      logprintf ("Try to clean %s from %s",
 				       badname, binkname);
 			      logwrite (1, 10);
 			      binkname[strlen (binkname) - 3] =
@@ -453,7 +453,7 @@ short kill (char *tmpname, short boxes, struct link *blink)
 			    }
 			}
 		    }
-		  sprintf (logout, "Killed %s for %u:%u/%u.%u", badname,
+		  logprintf ("Killed %s for %u:%u/%u.%u", badname,
 			   blink->address.zone, blink->address.net,
 			   blink->address.node, blink->address.point);
 		  if (logfileok)

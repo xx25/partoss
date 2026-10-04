@@ -25,47 +25,47 @@ void errexit(short error, char *file, unsigned short line)
     retcode = 0;
     break;
   case 1:
-    sprintf(logout, "!!! Memory allocation error");
+    logprintf("!!! Memory allocation error");
     retcode = -1;
     break;
 
   case 2:
-    sprintf(logout, "!!! File %s open/create error, OS error %d", errname, errno);
+    logprintf("!!! File %s open/create error, OS error %d", errname, errno);
     retcode = -1;
     break;
 
   case 3:
 #ifdef __DOS__
-    sprintf(logout, "!!! SWAP error - not enough memory or disk space for swapping");
+    logprintf("!!! SWAP error - not enough memory or disk space for swapping");
 #else
-    sprintf(logout, "!!! SPAWN error - not enough resources for run external progpam");
+    logprintf("!!! SPAWN error - not enough resources for run external progpam");
 #endif
     retcode = -2;
     break;
 
   case 4:
-    sprintf(logout, "!!! Internal program error, OS error %d", errno);
+    logprintf("!!! Internal program error, OS error %d", errno);
     retcode = -3;
     break;
 
   case 5:
-    sprintf(logout, "!!! Unknown area name %s", errname);
+    logprintf("!!! Unknown area name %s", errname);
     retcode = 11;
     break;
 
   case 6:
-    sprintf(logout, "!!! Can't find file %s", errname);
+    logprintf("!!! Can't find file %s", errname);
     retcode = 10;
     break;
 
   case 7:
-    sprintf(logout, "!!! Read/write error, OS error %d", errno);
+    logprintf("!!! Read/write error, OS error %d", errno);
     retcode = -1;
     break;
 
   case 8:
   case 9:
-    sprintf(logout, "!!! Can't find %s", error == 8 ? "BadArea" : "DupeArea");
+    logprintf("!!! Can't find %s", error == 8 ? "BadArea" : "DupeArea");
     retcode = 11;
     break;
 
@@ -80,27 +80,27 @@ void errexit(short error, char *file, unsigned short line)
     break;
 
   case 11:
-    sprintf(logout, "!!! Write error (maybe disk full)");
+    logprintf("!!! Write error (maybe disk full)");
     retcode = -1;
     break;
 
   case 12:
-    sprintf(logout, "!!! Area %s damaged, use SQFix", rcurarea);
+    logprintf("!!! Area %s damaged, use SQFix", rcurarea);
     retcode = 12;
     break;
 
   case 13:
-    sprintf(logout, "!!! Error while file %s rename/move", errname);
+    logprintf("!!! Error while file %s rename/move", errname);
     retcode = 13;
     break;
 
   case 14:
-    sprintf(logout, "!!! It's seems that ParToss already ran");
+    logprintf("!!! It's seems that ParToss already ran");
     retcode = 14;
     break;
 
   case 15:
-    sprintf(logout, "!!! Emergency exit - internal error");
+    logprintf("!!! Emergency exit - internal error");
     retcode = 15;
     break;
   }
@@ -120,7 +120,7 @@ void errexit(short error, char *file, unsigned short line)
   }
   if(retcode < 0)
   {
-    sprintf(logout, "!!! Error was encountered in line %u of source file %s", line, file);
+    logprintf("!!! Error was encountered in line %u of source file %s", line, file);
     if(logfileok)
       logwrite(1, 1);
     ccprintf("%s\r\n", logout);
@@ -128,7 +128,7 @@ void errexit(short error, char *file, unsigned short line)
   if(tottoss || totsent || totpers || totdupes || totbad)
   {
     asis = 0;
-    sprintf(logout, "Total:");
+    logprintf("Total:");
     if(tottoss)
     {
       sprintf(areasbbs, " toss - %u", tottoss);
@@ -218,7 +218,7 @@ void errexit(short error, char *file, unsigned short line)
   unlink(cfname);
   if(logfileok)
   {
-    sprintf(logout, "End, ParToss %s\r\n", version);
+    logprintf("End, ParToss %s\r\n", version);
     logwrite(1, 1);
     Close(logfile);
     logfile = 0;

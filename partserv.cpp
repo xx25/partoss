@@ -230,7 +230,7 @@ void doserv(void)
     if(blink->rules == 65535ul)
       rulesent = 0;
   }
-  sprintf(logout, "%s message from %u:%u/%u.%u",
+  logprintf("%s message from %u:%u/%u.%u",
           (mode & 1024) ? "Fake" : "Real", mfnode.zone, mfnode.net, mfnode.node, mfnode.point);
   logwrite(1, 5);
   if(!quiet)
@@ -368,12 +368,12 @@ void doserv(void)
       {
       case 0:
       case 21:
-        sprintf(logout, "End of message detected");
+        logprintf("End of message detected");
         logwrite(1, 9);
         goto finish;
 
       case 1:
-        sprintf(logout, "Help Request detected");
+        logprintf("Help Request detected");
         logwrite(1, 9);
         makehelp();
         makemsg(tempsrv, "%Help", bcfg.mantmpl);
@@ -391,7 +391,7 @@ void doserv(void)
         break;
 
       case 5:
-        sprintf(logout, "Links Request detected");
+        logprintf("Links Request detected");
         logwrite(1, 9);
         gettoken(0);
         tokencpy(logout, BufSize);
@@ -419,12 +419,12 @@ void doserv(void)
           /*
              print file position
            */
-          //sprintf(logout, "echolog.$$$ position before truncate = %ld", tell(alog));
+          //logprintf("echolog.$$$ position before truncate = %ld", tell(alog));
           //logwrite(1, 13);
 
           if(chsize(alog, 0) != 0)
           {
-            sprintf(logout, "Error truncating %s, error %d", errname, errno);
+            logprintf("Error truncating %s, error %d", errname, errno);
             logwrite(1, 13);
           };
           lseek(alog, 0, SEEK_SET);
@@ -432,7 +432,7 @@ void doserv(void)
           /*
              print file position
            */
-          //sprintf(logout, "echolog.$$$ position after truncate = %ld", tell(alog));
+          //logprintf("echolog.$$$ position after truncate = %ld", tell(alog));
           //logwrite(1, 13);
 
           if(endstring[0])      // а эха-то и не указана!
@@ -578,21 +578,21 @@ void doserv(void)
           rescan = 1;
           rnode = mfnode;
           temprescan = tempsqd;
-          sprintf(logout, "ReScan Request detected and processed");
+          logprintf("ReScan Request detected and processed");
           logwrite(1, 9);
           scanbase(echolog, 1);
           tempsqd = temprescan;
         }
         else
         {                       // рескан запрещён
-          sprintf(logout, "ReScan Request detected but ignored");
+          logprintf("ReScan Request detected but ignored");
           logwrite(1, 9);
         }
         break;
 
       case 7:
       case 8:
-        sprintf(logout, "%s Request detected", (j == 7 ? "Passive" : "Active"));
+        logprintf("%s Request detected", (j == 7 ? "Passive" : "Active"));
         logwrite(1, 9);
         if(!endstring[0])
         {
@@ -667,7 +667,7 @@ void doserv(void)
         break;
 
       case 9:
-        sprintf(logout, "Status Request detected");
+        logprintf("Status Request detected");
         logwrite(1, 9);
         makestatus(blink);
         makemsg(tempsrv, "%Status", bcfg.mantmpl);
@@ -679,7 +679,7 @@ void doserv(void)
       case 11:
       case 12:
       case 30:
-        sprintf(logout, "Status change Request detected");
+        logprintf("Status change Request detected");
         logwrite(1, 9);
         linkchg = 1;
         gettoken(0);
@@ -753,7 +753,7 @@ void doserv(void)
       case 13:
       case 14:
       case 15:
-        sprintf(logout, "%sSubscribe for all echoes Request detected", (j == 15 ? "Un" : ""));
+        logprintf("%sSubscribe for all echoes Request detected", (j == 15 ? "Un" : ""));
         logwrite(1, 9);
         ttlist = rlist;
         while(ttlist)
@@ -779,7 +779,7 @@ void doserv(void)
       case 16:
       case 17:
       case 18:
-        sprintf(logout, "%sSubscribe for some groups Request detected", (j == 18 ? "Un" : ""));
+        logprintf("%sSubscribe for some groups Request detected", (j == 18 ? "Un" : ""));
         logwrite(1, 9);
         gettoken(0);
         for(k = 0; k < toklen; k++)
@@ -807,7 +807,7 @@ void doserv(void)
 
       case 19:
       case 20:
-        sprintf(logout, "%sSubscribe for echo Request detected", (j == 20 ? "Un" : ""));
+        logprintf("%sSubscribe for echo Request detected", (j == 20 ? "Un" : ""));
         logwrite(1, 9);
         if(isspace(token[1]))
         {
@@ -855,7 +855,7 @@ void doserv(void)
         break;
 
       case 22:
-        sprintf(logout, "Origin string detected");
+        logprintf("Origin string detected");
         logwrite(1, 9);
         goto finish;
 
@@ -869,7 +869,7 @@ void doserv(void)
           else if(toupper(token[0]) == 'G')
             sort = 2;
         }
-        sprintf(logout, "Extended List as file Request detected");
+        logprintf("Extended List as file Request detected");
         logwrite(1, 9);
         makelist(4, sort);
         cclose(&tempsrv, __FILE__, __LINE__);
@@ -898,11 +898,11 @@ void doserv(void)
 
       case 26:
       availtoo:
-        sprintf(logout, "UpLink's Lists Request detected");
+        logprintf("UpLink's Lists Request detected");
         logwrite(1, 9);
         if(bcfg.uplname)
         {
-          sprintf(logout, "\r\nAvailable areas from all UpLinks:\r\n");
+          logprintf("\r\nAvailable areas from all UpLinks:\r\n");
           mywrite(tempsrv, logout, __FILE__, __LINE__);
           tname = bcfg.uplname;
           while(tname)
@@ -910,7 +910,7 @@ void doserv(void)
             tupl = (short)sopen(tname->echolist, O_RDONLY | O_BINARY, SH_DENYNO);
             if(tupl != -1)
             {
-              sprintf(logout, "\r\nUpLink %u:%u/%u.%u\r\n",
+              logprintf("\r\nUpLink %u:%u/%u.%u\r\n",
                       tname->upaddr.zone, tname->upaddr.net, tname->upaddr.node, tname->upaddr.point);
               mywrite(tempsrv, logout, __FILE__, __LINE__);
               curr = (unsigned short)rread(tupl, logout, BufSize, __FILE__, __LINE__);
@@ -927,7 +927,7 @@ void doserv(void)
         }
         else
         {
-          sprintf(logout, "\r\nSubscribe forwards are not allowed\r\n");
+          logprintf("\r\nSubscribe forwards are not allowed\r\n");
           mywrite(tempsrv, logout, __FILE__, __LINE__);
         }
         makemsg(tempsrv, "%Avail", "");
@@ -936,11 +936,11 @@ void doserv(void)
         break;
 
       case 27:
-        sprintf(logout, "UpLink's Lists as file Request detected");
+        logprintf("UpLink's Lists as file Request detected");
         logwrite(1, 9);
         if(bcfg.uplname)
         {
-          sprintf(logout, "\r\nAvailable areas from all UpLinks:\r\n");
+          logprintf("\r\nAvailable areas from all UpLinks:\r\n");
           mywrite(tempsrv, logout, __FILE__, __LINE__);
           tname = bcfg.uplname;
           while(tname)
@@ -948,7 +948,7 @@ void doserv(void)
             tupl = (short)sopen(tname->echolist, O_RDONLY | O_BINARY, SH_DENYNO);
             if(tupl != -1)
             {
-              sprintf(logout, "\r\nUpLink %u:%u/%u.%u\r\n",
+              logprintf("\r\nUpLink %u:%u/%u.%u\r\n",
                       tname->upaddr.zone, tname->upaddr.net, tname->upaddr.node, tname->upaddr.point);
               mywrite(tempsrv, logout, __FILE__, __LINE__);
               curr = (unsigned short)rread(tupl, logout, BufSize, __FILE__, __LINE__);
@@ -987,7 +987,7 @@ void doserv(void)
         }
         else
         {
-          sprintf(logout, "\r\nSubscribe forwards are not allowed\r\n");
+          logprintf("\r\nSubscribe forwards are not allowed\r\n");
           mywrite(tempsrv, logout, __FILE__, __LINE__);
           makemsg(tempsrv, "%Avail", "");
           chsize(tempsrv, 0);
@@ -1014,14 +1014,14 @@ void doserv(void)
             tblink.manager = ttblink->manager;
           else
             tblink.manager = 0;
-          sprintf(logout, "Switch to address %u:%u/%u.%u detected",
+          logprintf("Switch to address %u:%u/%u.%u detected",
                   tblink.address.zone, tblink.address.net, tblink.address.node, tblink.address.point);
           logwrite(1, 9);
         }
         break;
 
       default:
-        sprintf(logout, "Subscribe to echoes Request detected");
+        logprintf("Subscribe to echoes Request detected");
         logwrite(1, 9);
         // defblock:
         if(toklen)
@@ -1137,7 +1137,7 @@ finish:
             if(cmpaddr(&(tuname->upaddr), &(tname->upaddr)) == 0)
             {
               memcpy(&pktaddr, &(tuname->upaddr), szmyaddr);
-              sprintf(logout, "%s%s\r", (tname->where == 1) ? "+" : "-", tname->persarea);
+              logprintf("%s%s\r", (tname->where == 1) ? "+" : "-", tname->persarea);
               mywrite(tempsrv, logout, __FILE__, __LINE__);
               isforw = 1;
               tname->touch = 1;
@@ -1196,27 +1196,27 @@ finish:
   }
   if(linkchg)
   {
-    sprintf(logout, "Status change for %u:%u/%u.%u\r\n\r\n",
+    logprintf("Status change for %u:%u/%u.%u\r\n\r\n",
             blink->address.zone, blink->address.net, blink->address.node, blink->address.point);
     mywrite(tempsrv, logout, __FILE__, __LINE__);
     if(strcmp(tblink.echopass, blink->echopass) != 0)
     {
-      sprintf(logout, "Password changed to %s\r\n", tblink.echopass);
+      logprintf("Password changed to %s\r\n", tblink.echopass);
       mywrite(tempsrv, logout, __FILE__, __LINE__);
     }
     if(strcmp(tblink.packer, blink->packer) != 0)
     {
-      sprintf(logout, "Archiver changed to %s\r\n", tblink.packer);
+      logprintf("Archiver changed to %s\r\n", tblink.packer);
       mywrite(tempsrv, logout, __FILE__, __LINE__);
     }
     if(tblink.pktsize != blink->pktsize)
     {
-      sprintf(logout, "Max packet size changed to %lu\r\n", tblink.pktsize);
+      logprintf("Max packet size changed to %lu\r\n", tblink.pktsize);
       mywrite(tempsrv, logout, __FILE__, __LINE__);
     }
     if(tblink.arcsize != blink->arcsize)
     {
-      sprintf(logout, "Max archive size changed to %lu\r\n", tblink.arcsize);
+      logprintf("Max archive size changed to %lu\r\n", tblink.arcsize);
       mywrite(tempsrv, logout, __FILE__, __LINE__);
     }
     memcpy(blink, &tblink, szlink);
@@ -1263,7 +1263,7 @@ void makehelp(void)
       mystrncpy(errname, bcfg.help, DirSize);
       errexit(2, __FILE__, __LINE__);
     }
-    while((fmax = (unsigned short)rread(thelp, pktbuf, buflen, __FILE__, __LINE__)) > 0)
+    while((fmax = (unsigned short)rreadz(thelp, pktbuf, buflen, __FILE__, __LINE__)) > 0)
       wwrite(tempsrv, pktbuf, fmax, __FILE__, __LINE__);
     cclose(&thelp, __FILE__, __LINE__);
   }
@@ -1303,7 +1303,7 @@ void makelist(short type, short sort)   // type: 1 - list, 2 - query,
   switch (type)
   {
   case 1:
-    sprintf(logout, "List of all areas on %u:%u/%u.%u\r\n\r\n", node.zone, node.net, node.node, node.point);
+    logprintf("List of all areas on %u:%u/%u.%u\r\n\r\n", node.zone, node.net, node.node, node.point);
     break;
   case 2:
     mystrncpy(logout, "List of areas You are connected to\r\n\r\n", BufSize);
@@ -1416,7 +1416,7 @@ void makelist(short type, short sort)   // type: 1 - list, 2 - query,
                 mywrite(tempsrv, glogout, __FILE__, __LINE__);
                 gwr = 1;
               }
-              sprintf(logout, "%s %s\r\n", format, descr);
+              logprintf("%s %s\r\n", format, descr);
               mywrite(tempsrv, logout, __FILE__, __LINE__);
             }
             if(type == 1)
@@ -1428,7 +1428,7 @@ void makelist(short type, short sort)   // type: 1 - list, 2 - query,
                   mywrite(tempsrv, glogout, __FILE__, __LINE__);
                   gwr = 1;
                 }
-                sprintf(logout, "%s %-10s [%c] %s\r", format, sstatus[status], newarea->group, descr);
+                logprintf("%s %-10s [%c] %s\r", format, sstatus[status], newarea->group, descr);
                 mywrite(tempsrv, logout, __FILE__, __LINE__);
               }
               else
@@ -1445,7 +1445,7 @@ void makelist(short type, short sort)   // type: 1 - list, 2 - query,
                       mywrite(tempsrv, glogout, __FILE__, __LINE__);
                       gwr = 1;
                     }
-                    sprintf(logout, "%s %-10s [%c] ", format, sstatus[status], newarea->group);
+                    logprintf("%s %-10s [%c] ", format, sstatus[status], newarea->group);
                     numstr = 1;
                   }
                   else
@@ -1497,13 +1497,13 @@ void makelist(short type, short sort)   // type: 1 - list, 2 - query,
                   {
                   case 0:
                   case 1:
-                    sprintf(logout, "%s [%c] %s\r", format, newarea->group, descr);
+                    logprintf("%s [%c] %s\r", format, newarea->group, descr);
                     break;
                   case 3:
-                    sprintf(logout, "%s (%c) %s\r", format, newarea->group, descr);
+                    logprintf("%s (%c) %s\r", format, newarea->group, descr);
                     break;
                   case 4:
-                    sprintf(logout, "%s {%c} %s\r", format, newarea->group, descr);
+                    logprintf("%s {%c} %s\r", format, newarea->group, descr);
                     break;
                   }
                   mywrite(tempsrv, logout, __FILE__, __LINE__);
@@ -1517,7 +1517,7 @@ void makelist(short type, short sort)   // type: 1 - list, 2 - query,
                   {
                     if(!numstr)
                     {
-                      sprintf(logout, "%s [%c] ", format, newarea->group);
+                      logprintf("%s [%c] ", format, newarea->group);
                       numstr = 1;
                     }
                     else
@@ -1574,38 +1574,38 @@ void makestatus(struct link *blink)
   short k, numofarc;
   struct packer arcdef;
 
-  sprintf(logout, "Status of Your station\r\n\r\n");
+  logprintf("Status of Your station\r\n\r\n");
   mywrite(tempsrv, logout, __FILE__, __LINE__);
-  sprintf(logout, "Address - %u:%u/%u.%u\r", blink->address.zone,
+  logprintf("Address - %u:%u/%u.%u\r", blink->address.zone,
           blink->address.net, blink->address.node, blink->address.point);
   mywrite(tempsrv, logout, __FILE__, __LINE__);
-  sprintf(logout, "AutoCreate from Your station - %s\r", (blink->create == 1) ? "enabled" : "disabled");
+  logprintf("AutoCreate from Your station - %s\r", (blink->create == 1) ? "enabled" : "disabled");
   mywrite(tempsrv, logout, __FILE__, __LINE__);
-  sprintf(logout, "Put on hold ArcMail to You - %s\r", (blink->hold == 1) ? "yes" : "no");
+  logprintf("Put on hold ArcMail to You - %s\r", (blink->hold == 1) ? "yes" : "no");
   mywrite(tempsrv, logout, __FILE__, __LINE__);
   if(blink->autoadd)
   {
-    sprintf(logout, "Auto subscribing on echoes with mask %s\r", blink->crmask);
+    logprintf("Auto subscribing on echoes with mask %s\r", blink->crmask);
     mywrite(tempsrv, logout, __FILE__, __LINE__);
   }
   if(blink->pktsize)
   {
-    sprintf(logout, "Max packet size - %lu\r", blink->pktsize);
+    logprintf("Max packet size - %lu\r", blink->pktsize);
     mywrite(tempsrv, logout, __FILE__, __LINE__);
   }
   if(blink->arcsize)
   {
-    sprintf(logout, "Max archive size - %lu\r", blink->arcsize);
+    logprintf("Max archive size - %lu\r", blink->arcsize);
     mywrite(tempsrv, logout, __FILE__, __LINE__);
   }
-  sprintf(logout, "Archiver used - %s\r", blink->packer);
+  logprintf("Archiver used - %s\r", blink->packer);
   mywrite(tempsrv, logout, __FILE__, __LINE__);
-  sprintf(logout, "Password for Echo Manager - %s\r", blink->echopass);
+  logprintf("Password for Echo Manager - %s\r", blink->echopass);
   mywrite(tempsrv, logout, __FILE__, __LINE__);
-  sprintf(logout, "Echo groups available to You - %s\r", blink->group);
+  logprintf("Echo groups available to You - %s\r", blink->group);
   mywrite(tempsrv, logout, __FILE__, __LINE__);
 
-  sprintf(logout, "List of available archivers:\r");
+  logprintf("List of available archivers:\r");
   mywrite(tempsrv, logout, __FILE__, __LINE__);
 //  cfname[strlen(cfname)-1]='c';
 //  if((arccfb=sopen(cfname,O_RDONLY|O_BINARY,SH_DENYWR))==-1) errexit(2,__FILE__,__LINE__);
@@ -1614,10 +1614,10 @@ void makestatus(struct link *blink)
   for(k = 0; k < numofarc; k++)
   {
     rread(compset, &arcdef, szpacker, __FILE__, __LINE__);
-    sprintf(logout, "%s ", arcdef.name);
+    logprintf("%s ", arcdef.name);
     mywrite(tempsrv, logout, __FILE__, __LINE__);
   }
-  sprintf(logout, "\r");
+  logprintf("\r");
   mywrite(tempsrv, logout, __FILE__, __LINE__);
 //  cclose(&arccfb,__FILE__,__LINE__);
   mywrite(tempsrv, "\r\n", __FILE__, __LINE__);
@@ -1644,7 +1644,7 @@ void makelinks(char *areaname)
       {
         lseek(areaset, ttlist->alist[j].areaoffs, SEEK_SET);
         rread(areaset, newarea, szarea, __FILE__, __LINE__);
-        sprintf(logout,
+        logprintf(
                 "Area %s on %u:%u/%u.%u is subscribed to:\r\n\r\n",
                 aname, newarea->myaka.zone, newarea->myaka.net, newarea->myaka.node, newarea->myaka.point);
         mywrite(tempsrv, logout, __FILE__, __LINE__);
@@ -1653,7 +1653,7 @@ void makelinks(char *areaname)
           rread(areaset, &tsnd, szmyaddr, __FILE__, __LINE__);
           if(!tsnd.deny)
           {
-            sprintf(logout, "%u:%u/%u.%u%s%s\r\n", tsnd.zone,
+            logprintf("%u:%u/%u.%u%s%s\r\n", tsnd.zone,
                     tsnd.net, tsnd.node, tsnd.point,
                     tsnd.rdonly ? " (Read-only)" : "", tsnd.passive ? " (Passive)" : "");
             mywrite(tempsrv, logout, __FILE__, __LINE__);
@@ -1764,7 +1764,7 @@ fordelarea:
 
               if(tname->found < 5)
               {
-                sprintf(logout, "Area %s added\r\n", tname->persarea);
+                logprintf("Area %s added\r\n", tname->persarea);
                 mywrite(tempsrv, logout, __FILE__, __LINE__);
               };
 
@@ -1808,7 +1808,7 @@ fordelarea:
       }
       if(tname->found != 8)
       {
-        sprintf(logout, "Area %s not found\r\n", tname->persarea);
+        logprintf("Area %s not found\r\n", tname->persarea);
         mywrite(tempsrv, logout, __FILE__, __LINE__);
       }
       if(tname->found == 2)
@@ -2033,7 +2033,7 @@ void chareacfg(struct uplname *areas, char *file)
           {
             if(!tname->wild)
             {
-              sprintf(logout, "Area %s is not available for You\r\n", tname->persarea);
+              logprintf("Area %s is not available for You\r\n", tname->persarea);
               mywrite(tempsrv, logout, __FILE__, __LINE__);
               wwrite(prttemp,::string, maxstr2[0], __FILE__, __LINE__);
             }
@@ -2045,7 +2045,7 @@ void chareacfg(struct uplname *areas, char *file)
               nowork = 1;
               if(!tname->wild)
               {
-                sprintf(logout, "Area %s already connected for You\r\n", tname->persarea);
+                logprintf("Area %s already connected for You\r\n", tname->persarea);
                 mywrite(tempsrv, logout, __FILE__, __LINE__);
               }
             }
@@ -2054,7 +2054,7 @@ void chareacfg(struct uplname *areas, char *file)
               nowork = 1;
               if(!tname->wild)
               {
-                sprintf(logout, "Area %s is not connected for You\r\n", tname->persarea);
+                logprintf("Area %s is not connected for You\r\n", tname->persarea);
                 mywrite(tempsrv, logout, __FILE__, __LINE__);
               }
             }
@@ -2064,7 +2064,7 @@ void chareacfg(struct uplname *areas, char *file)
               {
                 if(!tname->wild)
                 {
-                  sprintf(logout, "Area %s is already passive for You\r\n", tname->persarea);
+                  logprintf("Area %s is already passive for You\r\n", tname->persarea);
                   mywrite(tempsrv, logout, __FILE__, __LINE__);
                 }
               }
@@ -2077,7 +2077,7 @@ void chareacfg(struct uplname *areas, char *file)
               {
                 if(!tname->wild)
                 {
-                  sprintf(logout, "Area %s is already active for You\r\n", tname->persarea);
+                  logprintf("Area %s is already active for You\r\n", tname->persarea);
                   mywrite(tempsrv, logout, __FILE__, __LINE__);
                 }
               }
@@ -2151,16 +2151,16 @@ void chareacfg(struct uplname *areas, char *file)
               switch (tname->where)
               {
               case 1:
-                sprintf(logout, "Area %s %s\r\n", tname->persarea, "added");
+                logprintf("Area %s %s\r\n", tname->persarea, "added");
                 break;
               case 2:
-                sprintf(logout, "Area %s %s\r\n", tname->persarea, "deleted");
+                logprintf("Area %s %s\r\n", tname->persarea, "deleted");
                 break;
               case 3:
-                sprintf(logout, "Area %s %s\r\n", tname->persarea, "passivated");
+                logprintf("Area %s %s\r\n", tname->persarea, "passivated");
                 break;
               case 4:
-                sprintf(logout, "Area %s %s\r\n", tname->persarea, "activated");
+                logprintf("Area %s %s\r\n", tname->persarea, "activated");
                 break;
               }
               mywrite(tempsrv, logout, __FILE__, __LINE__);
@@ -2265,7 +2265,7 @@ void chareacfg(struct uplname *areas, char *file)
             case 3:            //restored from deleted
               mywrite(prttemp, "EchoArea   ", __FILE__, __LINE__);
               wwrite(prttemp, token, maxstr2[0] - curtpos[0] + toklen, __FILE__, __LINE__);
-              sprintf(logout, "Deleted Area %s restored to EchoArea by Echo Manager", tname->persarea);
+              logprintf("Deleted Area %s restored to EchoArea by Echo Manager", tname->persarea);
               logwrite(1, 6);
               if((crtrep = (short)sopen(crtreprt, O_RDWR | O_BINARY, SH_DENYWR)) == -1)
               {
@@ -2376,7 +2376,7 @@ void chlinkcfg(struct link *blink, char *file)
             break;
           }
           tstyle[2] = ' ';
-          sprintf(logout, "%s %u:%u/%u.%u ",
+          logprintf("%s %u:%u/%u.%u ",
                   blink->manager ? "LinkManager" : "Link",
                   blink->address.zone, blink->address.net, blink->address.node, blink->address.point);
           if(blink->mask & 256)
@@ -2576,22 +2576,22 @@ void makemsg(short handle, char *what, char *templ)
         lseek(tempsplt, 0, SEEK_SET);
         if(strcmp(what, "forwarding"))
         {
-          sprintf(logout, "Splitted by Parma Tosser, part %u from %u\r\r", (unsigned short)j, (unsigned short)i);
+          logprintf("Splitted by Parma Tosser, part %u from %u\r\r", (unsigned short)j, (unsigned short)i);
           mywrite(tempsplt, logout, __FILE__, __LINE__);
 /* Maybe temporary included strings */
-          sprintf(logout, "%s, part %u from %u", bcfg.subj, (unsigned short)j, (unsigned short)i);
+          logprintf("%s, part %u from %u", bcfg.subj, (unsigned short)j, (unsigned short)i);
           mystrncpy(bufpkt.subj, logout, 71);
 /* Maybe temporary included strings */
         }
         else
-          sprintf(logout, "%s", bcfg.subj);
+          logprintf("%s", bcfg.subj);
         splitsize = strlen(logout);
         if(j < i)
         {
           while(splitsize < (bcfg.mansize - 100))
           {
             fmax =
-              (unsigned short)rread(mhandle, pktbuf,
+              (unsigned short)rreadz(mhandle, pktbuf,
                                     (unsigned
                                      short)((bcfg.mansize -
                                              splitsize) >
@@ -2613,7 +2613,7 @@ void makemsg(short handle, char *what, char *templ)
         }
         else
           while((fmax =
-                 (unsigned short)rread(mhandle, pktbuf,
+                 (unsigned short)rreadz(mhandle, pktbuf,
                                        (unsigned
                                         short)((bcfg.mansize -
                                                 splitsize) >
@@ -2623,9 +2623,9 @@ void makemsg(short handle, char *what, char *templ)
         if(strcmp(what, "forwarding") == 0)
         {
           if(j < i)
-            sprintf(logout, "\rContinued in next message\r");
+            logprintf("\rContinued in next message\r");
           else
-            sprintf(logout, "\rEnd of splitted text\r");
+            logprintf("\rEnd of splitted text\r");
           mywrite(tempsplt, logout, __FILE__, __LINE__);
         }
         flushbuf(tempsplt);
@@ -2635,7 +2635,7 @@ void makemsg(short handle, char *what, char *templ)
         buftomsg(4);
         if(strcmp(what, "forwarding"))
           mystrncpy(bufpkt.subj, bcfg.subj, 71);
-        sprintf(logout, "Created splitted reply (%s), part %u from %u", what, (unsigned short)j, (unsigned short)i);
+        logprintf("Created splitted reply (%s), part %u from %u", what, (unsigned short)j, (unsigned short)i);
         logwrite(1, 6);
         if(!quiet)
           ccprintf("%s\r\n", logout);
@@ -2648,7 +2648,7 @@ void makemsg(short handle, char *what, char *templ)
       tempmsg = mhandle;
       needout = 1;
       buftomsg(4);
-      sprintf(logout, "Created reply (%s)", what);
+      logprintf("Created reply (%s)", what);
       logwrite(1, 6);
       if(!quiet)
         ccprintf("%s\r\n", logout);
@@ -2835,7 +2835,7 @@ void inecholog(char *areaname)
   if(!present)
   {
     lseek(alog, 0, SEEK_END);
-    sprintf(logout, "%s\r\n", areaname);
+    logprintf("%s\r\n", areaname);
     mywrite(alog, logout, __FILE__, __LINE__);
     flushbuf(alog);
   }
@@ -2876,7 +2876,7 @@ void delorph(struct uplname *utarea, struct uplname *ttname)
     tareas->touch = 0;
     tareas->next = NULL;
   }
-  sprintf(logout, "Echo Area %s (orphaned) killed by Echo Manager", newarea->areaname);
+  logprintf("Echo Area %s (orphaned) killed by Echo Manager", newarea->areaname);
   logwrite(1, 6);
   if((crtrep = (short)sopen(crtreprt, O_RDWR | O_BINARY, SH_DENYWR)) == -1)
   {
@@ -2919,7 +2919,7 @@ void delorph(struct uplname *utarea, struct uplname *ttname)
   sftime = time(NULL);
   mylocaltime(&sftime, &tmt);
   wwrite(prttemp,::string, fpart, __FILE__, __LINE__);
-  sprintf(logout, " %-4u%-2u%-2u ", tmt.tm_year, tmt.tm_mon, tmt.tm_mday);
+  logprintf(" %-4u%-2u%-2u ", tmt.tm_year, tmt.tm_mon, tmt.tm_mday);
   wwrite(prttemp, ttemp + 1, maxstr[0] - fpart - 1, __FILE__, __LINE__);
 }
 
@@ -2959,7 +2959,7 @@ void delorphn(struct uplname *utarea, struct uplname *ttname, char *descr)
     tareas->touch = 0;
     tareas->next = NULL;
   }
-  sprintf(logout, "Echo Area %s (orphaned) marked as DeletedArea by Echo Manager", newarea->areaname);
+  logprintf("Echo Area %s (orphaned) marked as DeletedArea by Echo Manager", newarea->areaname);
   logwrite(1, 6);
   if((crtrep = (short)sopen(crtreprt, O_RDWR | O_BINARY, SH_DENYWR)) == -1)
   {
@@ -2983,7 +2983,7 @@ void delorphn(struct uplname *utarea, struct uplname *ttname, char *descr)
   sftime = time(NULL);
   mylocaltime(&sftime, &tmt);
 //  wwrite(prttemp,string,fpart,__FILE__,__LINE__);
-  sprintf(logout, " %04u%02u%02u ", tmt.tm_year + 1900, tmt.tm_mon + 1, tmt.tm_mday);
+  logprintf(" %04u%02u%02u ", tmt.tm_year + 1900, tmt.tm_mon + 1, tmt.tm_mday);
 /*  dtemp=itoa(tmt->tm_year+1900,dtemp,10);
   mystrncpy(logout," ",2);
   mystrncat(logout,dtemp,5,DirSize);
@@ -3075,8 +3075,8 @@ short delkill(short deltype)
     }
     lseek(areaset, tlist->alist[i].areaoffs, SEEK_SET);
     rread(areaset, newarea, szarea, __FILE__, __LINE__);
-//    sprintf(logout,"Echo Area %s (orphaned) killed by Echo Manager",newarea->areaname);
-    sprintf(logout,
+//    logprintf("Echo Area %s (orphaned) killed by Echo Manager",newarea->areaname);
+    logprintf(
             "Expired DeletedArea %s keyword (%i days) killed by Echo Manager", newarea->areaname, deltype ? 0 : diff);
     logwrite(1, 6);
     if(bcfg.delfiles)
@@ -3118,16 +3118,16 @@ void dolist(short rt)
   switch (rt)
   {
   case 1:
-    sprintf(logout, "List Request detected");
+    logprintf("List Request detected");
     break;
   case 2:
-    sprintf(logout, "Query Request detected");
+    logprintf("Query Request detected");
     break;
   case 3:
-    sprintf(logout, "Notify Request detected");
+    logprintf("Notify Request detected");
     break;
   case 4:
-    sprintf(logout, "Extended List Request detected");
+    logprintf("Extended List Request detected");
     break;
   }
   logwrite(1, 9);
@@ -3205,7 +3205,7 @@ void relink(void)
               rread(areaset, &tsnd, szmyaddr, __FILE__, __LINE__);
               if(cmpaddr(&tsnd, &tuname->upaddr) == 0)
               {
-                sprintf(logout, "+%s\r", newarea->areaname);
+                logprintf("+%s\r", newarea->areaname);
                 mywrite(tempsrv, logout, __FILE__, __LINE__);
                 isforw = 1;
               }

@@ -207,7 +207,7 @@ void setreply (long from, long to)
         from = newarea->curindex + i + 1;
         if (from == loop2 && linktype == 2)
     {
-      sprintf (logout,
+      logprintf (
          "??? Index/Chain loop in area %s (# %ld), use SQFix",
          newarea->areaname, from);
       logwrite (1, 1);
@@ -216,7 +216,7 @@ void setreply (long from, long to)
         next = readmsg (from - 1, 1);
         if (next == loop && linktype == 2)
     {
-      sprintf (logout,
+      logprintf (
          "??? Index/Chain loop in area %s (# %ld), use SQFix",
          newarea->areaname, from);
       logwrite (1, 1);
@@ -253,7 +253,7 @@ long readmsg (long number, short type)
   rread (newarea->sqd.sqd, &head, 266, __FILE__, __LINE__);
   if (head.ident != 0xAFAE4453L)
     {
-      sprintf (logout,
+      logprintf (
          "??? Area %s is damaged or index file is corrupted (# %ld)",
          newarea->areaname, number);
       if (logfileok)
@@ -269,7 +269,9 @@ long readmsg (long number, short type)
       smsglen = head.msglength - 239;
       if (smsglen > 512)
   smsglen = 512;
-      rread (newarea->sqd.sqd, sqdbuf, (unsigned short)(smsglen), __FILE__,
+      if (smsglen < 0)
+  smsglen = 0;
+      rreadz (newarea->sqd.sqd, sqdbuf, (unsigned short)(smsglen), __FILE__,
        __LINE__);
       temp = strstr (sqdbuf, "\1MSGID: ");
       if (temp && (temp - sqdbuf) < smsglen)

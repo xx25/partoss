@@ -10,7 +10,8 @@
 #include "control.h"
 #include "crc32.h"
 
-void pkttobuf (void)
+// Returns 1 if the message header runs past the data read (damaged packet)
+short pkttobuf (void)
 {
   unsigned short i, j, fmax2, validdt, dtlen;
   long tpos;
@@ -60,7 +61,8 @@ gooddt:
   mystrncpy (tstrtime, asctime (&tmt), 39);
   bufpkt.timeto = strtime (tstrtime);
 //  pcurpos+=34;
-  pcurpos = (unsigned short)(15 + dtlen);
+  // the header starts at pcurpos (after any garbage tosspkt skipped)
+  pcurpos = (unsigned short)(pcurpos + 15 + dtlen);
   j = (short)strlen (bufpkt.datetime);
   if (j < 19)
     {
@@ -68,21 +70,31 @@ gooddt:
 	bufpkt.datetime[i] = ' ';
       bufpkt.datetime[19] = 0;
       pcurpos -= (unsigned short)(19 - j);
-      while (*(pktbuf + pcurpos) == 0)
+      while (pcurpos < fmax && *(pktbuf + pcurpos) == 0)
 	pcurpos++;
     }
+  // pktbuf ends with two NULs after fmax (rreadz), so each strlen stops
+  // there at the latest; a name running into them means the header is cut
+  if (pcurpos >= fmax)
+    return 1;
   bufpkt.toname = pktbuf + pcurpos;
   ptolen = strlen (bufpkt.toname);
   pcurpos += (unsigned short)ptolen;
   pcurpos++;
+  if (pcurpos >= fmax)
+    return 1;
   bufpkt.fromname = pktbuf + pcurpos;
   pfromlen = strlen (bufpkt.fromname);
   pcurpos += (unsigned short)pfromlen;
   pcurpos++;
+  if (pcurpos >= fmax)
+    return 1;
   bufpkt.subj = pktbuf + pcurpos;
   psubjlen = strlen (bufpkt.subj);
   pcurpos += (unsigned short)psubjlen;
   pcurpos++;
+  if (pcurpos > fmax)
+    return 1;
   mystrncpy (gltoname, bufpkt.toname, 35);
   mystrncpy (glfromname, bufpkt.fromname, 35);
   mystrncpy (glsubj, bufpkt.subj, 71);
@@ -118,7 +130,7 @@ gooddt:
       else
 	{
 	  pcmsglen = j;
-	  sprintf (logout,
+	  logprintf (
 		   "Netmail message from %s, %u:%u/%u.%u to %s, %u:%u/%u.%u about \"%s\"",
 		   bufpkt.fromname, bufpkt.fromzone, bufpkt.fromnet,
 		   bufpkt.fromnode, bufpkt.frompoint, bufpkt.toname,
@@ -168,7 +180,7 @@ gooddt:
       while (!endmsg)
 	{
 	  fmax2 =
-	    (unsigned short)rread (pkt, pktbuf, buflen, __FILE__, __LINE__);
+	    (unsigned short)rreadz (pkt, pktbuf, buflen, __FILE__, __LINE__);
 	  temp = (char *)memchr (pktbuf, '\0', fmax2);
 	  if (temp || fmax2 < buflen)
 	    {
@@ -192,8 +204,10 @@ gooddt:
 	{
 	  if (tpos > buflen)
 	    tpos = buflen;
+	  if (tpos < 0)
+	    tpos = 0;
 	  lseek (temppkt, -tpos, SEEK_END);
-	  rread (temppkt, pktbuf, (unsigned short)(tpos), __FILE__, __LINE__);
+	  rreadz (temppkt, pktbuf, (unsigned short)(tpos), __FILE__, __LINE__);
 	  temp = locseenby (pktbuf);
 	  if (temp && ((temp - pktbuf) < tpos))
 	    pcmsglen = pmsglen - (tpos - (temp - pktbuf));
@@ -224,4 +238,5 @@ gooddt:
   pkludlen -= numlf;
   pmsglen -= numlf;
   pcmsglen -= numlf;
+  return 0;
 }

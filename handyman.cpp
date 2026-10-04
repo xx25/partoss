@@ -28,7 +28,7 @@ void handyman (short argc, char **argv)
   lseek (temppkt, 0, SEEK_SET);
   for (i = 3; i < argc; i++)
     {
-      sprintf (logout, "%s%s", (i == 3) ? "" : " ", argv[i]);
+      logprintf ("%s%s", (i == 3) ? "" : " ", argv[i]);
       for (j = 0; j < strlen (logout); j++)
 	if (logout[j] == bcfg.guard)
 	  logout[j] = '%';
@@ -80,7 +80,7 @@ void handyman (short argc, char **argv)
 	}
       blink = blink->next;
     }
-  sprintf (logout, "!!! Link %u:%u/%u.%u not found !!!", tnode.zone,
+  logprintf ("!!! Link %u:%u/%u.%u not found !!!", tnode.zone,
 	   tnode.net, tnode.node, tnode.point);
   logwrite (1, 2);
   if (!quiet)

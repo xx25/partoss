@@ -30,7 +30,7 @@ short buftosqd (struct area *ttarea, struct sqifile *tindex, short type)
   if (ttarea->type == 0)
     return -1;
   memcpy (rcurarea, curarea, arealength);
-  sprintf (logout, "***** Debug info: [%s] [%s] [%s] [%s]",
+  logprintf ("***** Debug info: [%s] [%s] [%s] [%s]",
      ttarea->areaname, newarea->areaname, persarea->areaname, curarea);
   logwrite (1, 12);
   if (type == 1)
@@ -384,29 +384,29 @@ short buftosqd (struct area *ttarea, struct sqifile *tindex, short type)
 
   if (ttarea->type == 2)
     {
-      sprintf (logout,
+      logprintf (
          "* Message in area %s from %s to %s (%s) moved to BadArea",
          curarea, sqhead.fromname, sqhead.toname, sqhead.subj);
       logwrite (1, 6);
       switch (badtype)
   {
   case 1:
-    sprintf (logout, "** Reason: Corrupted packet from %u:%u/%u.%u",
+    logprintf ("** Reason: Corrupted packet from %u:%u/%u.%u",
        pktaddr.zone, pktaddr.net, pktaddr.node, pktaddr.point);
     break;
   case 2:
-    sprintf (logout, "** Reason: Unknown area %s", curarea);
+    logprintf ("** Reason: Unknown area %s", curarea);
     break;
   case 3:
-    sprintf (logout, "** Reason: Read-Only area %s", curarea);
+    logprintf ("** Reason: Read-Only area %s", curarea);
     break;
   case 4:
-    sprintf (logout,
+    logprintf (
        "** Reason: Security violation (packet from %u:%u/%u.%u)",
        pktaddr.zone, pktaddr.net, pktaddr.node, pktaddr.point);
     break;
   case 5:
-    sprintf (logout, "** Reason: Locked area %s", curarea);
+    logprintf ("** Reason: Locked area %s", curarea);
     break;
   }
       logwrite (1, 6);
@@ -497,7 +497,7 @@ short buftosqd (struct area *ttarea, struct sqifile *tindex, short type)
   if (bigmess)
     {
       while ((fmax2 =
-        (unsigned short)rread (tempfile, tsbuf, buflen, __FILE__,
+        (unsigned short)rreadz (tempfile, tsbuf, buflen, __FILE__,
              __LINE__)) != 0)
   {
     if ((bcfg.delinfo && !ttarea->saveci) && kill2 && ttarea->type == 1)
@@ -601,7 +601,7 @@ short buftosqd (struct area *ttarea, struct sqifile *tindex, short type)
 /*
   if(reallen!=sqhead.msglength)
    {
-    sprintf(logout,"??? WARNING! Area %s, message %lu - size mismatch",
+    logprintf("??? WARNING! Area %s, message %lu - size mismatch",
             ttarea->areaname,sqbuf.nummsg);
     logwrite(1,4);
    }
@@ -661,7 +661,7 @@ short sqread (struct area *tarea, long pos, struct pointers *pnt, char *file,
   if (pnt->ident != 0xAFAE4453L)
     {
       badlog (tarea);
-      sprintf (logout, "BackUp: Area %s is corrupted", tarea->areaname);
+      logprintf ("BackUp: Area %s is corrupted", tarea->areaname);
       logwrite (1, 3);
       backup (0);
 //    errexit(12,file,line);

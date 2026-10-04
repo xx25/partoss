@@ -97,7 +97,7 @@ void dupcheck (short type)
       //
       if (bcfg.loglevel > 9)
 	{
-	  sprintf (logout, "Empty magic number!");
+	  logprintf ("Empty magic number!");
 	  logwrite (1, 10);
 	}
       //
@@ -121,7 +121,7 @@ void dupcheck (short type)
 	  //
 	  if (bcfg.loglevel > 9)
 	    {
-	      sprintf (logout, "Duped magic number - %lx",
+	      logprintf ("Duped magic number - %lx",
 		       ((type != 2) ? msgcrc32 : smsgcrc32));
 	      logwrite (1, 10);
 	    }
@@ -139,7 +139,7 @@ void dupcheck (short type)
       //
       if (bcfg.loglevel > 10)
 	{
-	  sprintf (logout, "Magic number - %lx",
+	  logprintf ("Magic number - %lx",
 		   ((type != 2) ? msgcrc32 : smsgcrc32));
 	  logwrite (1, 12);
 	}

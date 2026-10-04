@@ -227,13 +227,13 @@ void buftopkt (short type)
       else
   temp = tpack->name;
       if (type != 4)
-  sprintf (logout, "Create packet %s from %u:%u/%u.%u to %u:%u/%u.%u",
+  logprintf ("Create packet %s from %u:%u/%u.%u to %u:%u/%u.%u",
      temp, tpack->fromaddr.zone, tpack->fromaddr.net,
      tpack->fromaddr.node, tpack->fromaddr.point,
      tpack->outaddr.zone, tpack->outaddr.net, tpack->outaddr.node,
      tpack->outaddr.point);
       else
-  sprintf (logout, "??? Create temporary packet");
+  logprintf ("??? Create temporary packet");
       logwrite (1, 3);
       if (!quiet)
   ccprintf ("\r\n%s\r\n", logout);
@@ -351,7 +351,7 @@ void buftopkt (short type)
       hexascii (times, strtimes);
       mystrncpy (msgid, strtimes, 8);
       msgid[8] = 0;
-      sprintf (logout, "\1MSGID: %u:%u/%u.%u %s\r", tdn->aka.zone,
+      logprintf ("\1MSGID: %u:%u/%u.%u %s\r", tdn->aka.zone,
          tdn->aka.net, tdn->aka.node, tdn->aka.point,
          msgid);
       mywrite (tpack->handle, logout, __FILE__, __LINE__);
@@ -372,7 +372,7 @@ void buftopkt (short type)
   if (bigmess)
     {
       while ((fmax2 =
-        (unsigned short)rread (tempfile, tbuf, buflen, __FILE__,
+        (unsigned short)rreadz (tempfile, tbuf, buflen, __FILE__,
              __LINE__)) != 0)
   {
     if (match && tdn->changes & 4)
@@ -397,7 +397,7 @@ void buftopkt (short type)
             (unsigned short)(temp - tbuf), __FILE__,
             __LINE__);
         }
-      sprintf (logout, "(%u:%u/%u.%u)\r", glink->zone,
+      logprintf ("(%u:%u/%u.%u)\r", glink->zone,
          glink->net, glink->node, glink->point);
       mywrite (tpack->handle, logout, __FILE__, __LINE__);
     }
@@ -459,7 +459,7 @@ void buftopkt (short type)
         (unsigned short)(temp - buftemp->text), __FILE__,
         __LINE__);
     }
-        sprintf (logout, " (%u:%u/%u.%u)\r", glink->zone,
+        logprintf (" (%u:%u/%u.%u)\r", glink->zone,
            glink->net, glink->node, glink->point);
         mywrite (tpack->handle, logout, __FILE__, __LINE__);
       }
@@ -505,11 +505,11 @@ void buftopkt (short type)
       mystrncpy (tstrtime, asctime (&tmt), 39);
       converttime (tstrtime);
 /*
-      sprintf(logout,"\1Via %u:%u/%u.%u @%4d%02d%02d.%02d%02d%02d ParToss %s\r",
+      logprintf("\1Via %u:%u/%u.%u @%4d%02d%02d.%02d%02d%02d ParToss %s\r",
       tpack->fromaddr.zone,tpack->fromaddr.net,tpack->fromaddr.node,tpack->fromaddr.point,
       tmt->tm_year,tmt->tm_mon,tmt->tm_mday,tmt->tm_hour,tmt->tm_min,tmt->tm_sec,version);
 */
-      sprintf (logout, "\1Via ParToss %s %u:%u/%u.%u, %s\r", version,
+      logprintf ("\1Via ParToss %s %u:%u/%u.%u, %s\r", version,
          tpack->fromaddr.zone, tpack->fromaddr.net,
          tpack->fromaddr.node, tpack->fromaddr.point, ftstime);
       mywrite (tpack->handle, logout, __FILE__, __LINE__);
@@ -636,7 +636,7 @@ endwork:
       lseek (ouf, 0, SEEK_END);
       while (tpool)
   {
-    sprintf (logout, "%s\r", tpool->fullname);
+    logprintf ("%s\r", tpool->fullname);
     tpool = tpool->next;
   }
       cclose (&ouf, __FILE__, __LINE__);

@@ -13,11 +13,11 @@ void createpkts (void)
 {
   if (pkts == NULL)
     {
-      sprintf (logout, "Processing outbound directory %s", bcfg.workout);
+      logprintf ("Processing outbound directory %s", bcfg.workout);
       logwrite (1, 11);
       searchpkts (bcfg.workout, OUT_MASK);
       searchpkts (bcfg.workout, PKT_MASK);
-      sprintf (logout, "Processing outbound directory %s", bcfg.outbound);
+      logprintf ("Processing outbound directory %s", bcfg.outbound);
       logwrite (1, 11);
       searchpkts (outbound, OUT_MASK);
       searchpkts (outbound, PKT_MASK);
@@ -224,7 +224,7 @@ void searchpkts (char *path, char *ext)
 	  if (currname[0] && currname[strlen (currname) - 1] != DIRSEP[0])
 	    mystrncat (currname, DIRSEP, 3, DirSize);
 	  mystrncat (currname, fblk.name, DirSize, DirSize);
-	  sprintf (logout, "--- Adding of %s", currname);
+	  logprintf ("--- Adding of %s", currname);
 	  logwrite (1, 11);
 	  readhead (handle, &from, &to);
 /*

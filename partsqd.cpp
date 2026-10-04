@@ -252,7 +252,7 @@ void opensqd (struct area *ttarea, struct sqifile *tindex, short dup,
 		    {
 		      if (lich)
 			{
-			  sprintf (logout, "Waiting for open %s", sqdfile);
+			  logprintf ("Waiting for open %s", sqdfile);
 			  logwrite (1, 1);
 			}
 		      mtsleep (5);
@@ -337,7 +337,7 @@ void opensqd (struct area *ttarea, struct sqifile *tindex, short dup,
 		  rread (ttarea->sqd.sqb, &dupecur, 2, __FILE__, __LINE__);
 		  if ((dupemax > ttarea->dupes) || (dupecur > dupemax))
 		    {
-		      sprintf (logout, "!!! File %s.sqp possibly corrupted",
+		      logprintf ("!!! File %s.sqp possibly corrupted",
 			       ttarea->areafp);
 		      logwrite (1, 1);
 		    }
@@ -445,7 +445,7 @@ void createarea (char *areaname, short pers, struct myaddr *pktaddr2)
     }
   if (bladv)
     {
-      sprintf (logout, "Creating area using settings for node %u:%u/%u.%u",
+      logprintf ("Creating area using settings for node %u:%u/%u.%u",
 	       pktaddr2->zone, pktaddr2->net, pktaddr2->node, pktaddr2->point);
       logwrite (1, 14);
       if (bladv->persarea[0])
@@ -471,7 +471,7 @@ void createarea (char *areaname, short pers, struct myaddr *pktaddr2)
 		      usingshablon = 1;
 		      if (temp)
 			temp[1] = 0;
-		      sprintf (logout, "Using area %s as template",
+		      logprintf ("Using area %s as template",
 			       tlist->alist[i].areaname);
 		      logwrite (1, 14);
 		      goto founddef;
@@ -483,10 +483,10 @@ void createarea (char *areaname, short pers, struct myaddr *pktaddr2)
     }
   else
     {
-      sprintf (logout, "Creating area using default settings");
+      logprintf ("Creating area using default settings");
       logwrite (1, 14);
     }
-  sprintf (logout, "Using DefaultArea as template");
+  logprintf ("Using DefaultArea as template");
   logwrite (1, 14);
 founddef:
   if (bcfg.longfp)
@@ -567,7 +567,7 @@ founddef:
       }
       if (autonum == 0xFFFF)
       {
-        sprintf (logout, "AutoCreate overflow");
+        logprintf ("AutoCreate overflow");
         logwrite (1, 14);
         errexit (15, __FILE__, __LINE__);
       }
@@ -632,7 +632,7 @@ founddef:
 	    }
        if (autonum == 0xFFFF)
        {
-		  sprintf (logout, "AutoCreate overflow");
+		  logprintf ("AutoCreate overflow");
 		  logwrite (1, 14);
 		  errexit (15, __FILE__, __LINE__);
        }
@@ -862,7 +862,7 @@ founddef:
 		    mywrite (edlist, "-$", __FILE__, __LINE__);
 		  break;
 		case 'G':
-		  sprintf (logout, "%c", crarea->group);
+		  logprintf ("%c", crarea->group);
 		  mywrite (edlist, logout, __FILE__, __LINE__);
 		  break;
 		case 'D':
@@ -879,7 +879,7 @@ founddef:
 		  mywrite (edlist, "\"", __FILE__, __LINE__);
 		  break;
 		case 'A':
-		  sprintf (logout, "%u:%u/%u.%u", crarea->myaka.zone,
+		  logprintf ("%u:%u/%u.%u", crarea->myaka.zone,
 			   crarea->myaka.net, crarea->myaka.node,
 			   crarea->myaka.point);
 		  mywrite (edlist, logout, __FILE__, __LINE__);
@@ -899,20 +899,20 @@ founddef:
     {
     case 0:
       if (mode & 2048)
-	sprintf (logout, "Echo Area %s created from BadArea",
+	logprintf ("Echo Area %s created from BadArea",
 		 crarea->areaname);
       else
-	sprintf (logout, "Echo Area %s created by node %u:%u/%u.%u",
+	logprintf ("Echo Area %s created by node %u:%u/%u.%u",
 		 crarea->areaname, pktaddr.zone, pktaddr.net, pktaddr.node,
 		 pktaddr.point);
       break;
     case 1:
-      sprintf (logout, "Echo Area %s created as personal area",
+      logprintf ("Echo Area %s created as personal area",
 	       crarea->areaname);
       break;
     case 2:
     case 3:
-      sprintf (logout, "Echo Area %s created by Echo Manager",
+      logprintf ("Echo Area %s created by Echo Manager",
 	       crarea->areaname);
       break;
     }
@@ -960,7 +960,7 @@ goodnam2:
 	cr = 1;
       if (!cr)
 	mywrite (handle, "\r\n", __FILE__, __LINE__);
-      sprintf (logout, "EchoArea   %s %s -$", strupr (ttarea->areaname),
+      logprintf ("EchoArea   %s %s -$", strupr (ttarea->areaname),
 	       ttarea->areafp);
       mywrite (handle, logout, __FILE__, __LINE__);
     }
@@ -968,56 +968,56 @@ goodnam2:
     lseek (handle, 0, SEEK_END);
   if (ttarea->days)
     {
-      sprintf (logout, " -$d%u", ttarea->days);
+      logprintf (" -$d%u", ttarea->days);
       mywrite (handle, logout, __FILE__, __LINE__);
     }
   if (ttarea->messages)
     {
-      sprintf (logout, " -$m%u", ttarea->messages);
+      logprintf (" -$m%u", ttarea->messages);
       mywrite (handle, logout, __FILE__, __LINE__);
     }
   if (ttarea->skipmsg)
     {
-      sprintf (logout, " -$s%u", ttarea->skipmsg);
+      logprintf (" -$s%u", ttarea->skipmsg);
       mywrite (handle, logout, __FILE__, __LINE__);
     }
   if ((ttarea->dupes != bcfg.defarea.dupes) || (ttarea->killd_modified))
     {
       if (ttarea->killd_modified)
       {
-	sprintf (logout, " -$b%c%u", (ttarea->killd) == 1 ? 'k' : 'n',
+	logprintf (" -$b%c%u", (ttarea->killd) == 1 ? 'k' : 'n',
 		 ttarea->dupes);
       mywrite (handle, logout, __FILE__, __LINE__);
 		}
       else if (ttarea->dupes)
       {
-	sprintf (logout, " -$b%u", ttarea->dupes);
+	logprintf (" -$b%u", ttarea->dupes);
       mywrite (handle, logout, __FILE__, __LINE__);
       }
     }
   if (ttarea->passthr)
     {
-      sprintf (logout, " -0");
+      logprintf (" -0");
       mywrite (handle, logout, __FILE__, __LINE__);
     }
   if (ttarea->linktype && (ttarea->linktype != (bcfg.linktype + 1)))
     {
-      sprintf (logout, " -$l%u", ttarea->linktype);
+      logprintf (" -$l%u", ttarea->linktype);
       mywrite (handle, logout, __FILE__, __LINE__);
     }
   if (ttarea->saveci)
     {
-      sprintf (logout, " -$@");
+      logprintf (" -$@");
       mywrite (handle, logout, __FILE__, __LINE__);
     }
-  sprintf (logout, " -$g%c", ttarea->group);
+  logprintf (" -$g%c", ttarea->group);
   mywrite (handle, logout, __FILE__, __LINE__);
   if (descr)
     {
-      sprintf (logout, " -$n\"%s\"", descr);
+      logprintf (" -$n\"%s\"", descr);
       mywrite (handle, logout, __FILE__, __LINE__);
     }
-  sprintf (logout, " -p%u:%u/%u.%u",
+  logprintf (" -p%u:%u/%u.%u",
 	   ttarea->myaka.zone, ttarea->myaka.net, ttarea->myaka.node,
 	   ttarea->myaka.point);
   if (!(ttarea->myaka.point))
@@ -1052,23 +1052,23 @@ goodnam2:
     {
       i = 1;
       if (tsnd.zone != link->zone)
-	sprintf (logout, " %s%s%s%u:%u/%u.%u",
+	logprintf (" %s%s%s%u:%u/%u.%u",
 		 (link->rdonly | link->passive) ? "-" : "",
 		 link->rdonly ? "x" : "", link->passive ? "y" : "",
 		 link->zone, link->net, link->node, link->point);
       else if (tsnd.net != link->net)
-	sprintf (logout, " %s%s%s%u/%u.%u",
+	logprintf (" %s%s%s%u/%u.%u",
 		 (link->rdonly | link->passive) ? "-" : "",
 		 link->rdonly ? "x" : "", link->passive ? "y" : "", link->net,
 		 link->node, link->point);
       else if (tsnd.node != link->node)
-	sprintf (logout, " %s%s%s%u.%u",
+	logprintf (" %s%s%s%u.%u",
 		 (link->rdonly | link->passive) ? "-" : "",
 		 link->rdonly ? "x" : "", link->passive ? "y" : "",
 		 link->node, link->point);
       else
 	{
-	  sprintf (logout, " %s%s%s.%u",
+	  logprintf (" %s%s%s.%u",
 		   (link->rdonly | link->passive) ? "-" : "",
 		   link->rdonly ? "x" : "", link->passive ? "y" : "",
 		   link->point);

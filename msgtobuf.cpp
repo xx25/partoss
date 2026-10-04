@@ -39,7 +39,7 @@ short msgtobuf (char *fname)
   bufmess.tonet = bufmsg.tonet;
   bufmess.flags = bufmsg.flags;
   mflags = bufmess.flags;
-  fmax1 = rread (msg, sqdbuf, buflen, __FILE__, __LINE__);
+  fmax1 = rreadz (msg, sqdbuf, buflen, __FILE__, __LINE__);
   if (fmax1 < buflen)
     {
       sqdbuf[fmax1] = 0;
@@ -75,7 +75,7 @@ short msgtobuf (char *fname)
 	      __FILE__, __LINE__);
       while (!endmsg)
 	{
-	  fmax2 = rread (msg, sqdbuf, buflen, __FILE__, __LINE__);
+	  fmax2 = rreadz (msg, sqdbuf, buflen, __FILE__, __LINE__);
 	  if (fmax2 < buflen)
 	    endmsg = 1;
 	  mmsglen += fmax2;

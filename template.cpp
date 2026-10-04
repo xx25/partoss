@@ -28,7 +28,7 @@ short templat (short fhandle, short thandle)
     }
   chsize (retfile, 0);
   lseek (thandle, 0, SEEK_SET);
-  sbuffer[1] = (char *)myalloc (4096, __FILE__, __LINE__);
+  sbuffer[1] = (char *)myalloc (4097, __FILE__, __LINE__);
   endinput[1] = 0;
   while (!endinput[1])
     {
@@ -111,13 +111,13 @@ short templat (short fhandle, short thandle)
 		      break;
 
 		    case 6:
-		      sprintf (logout, "%u:%u/%u.%u", bufpkt.tozone,
+		      logprintf ("%u:%u/%u.%u", bufpkt.tozone,
 			       bufpkt.tonet, bufpkt.tonode, bufpkt.topoint);
 		      mywrite (retfile, logout, __FILE__, __LINE__);
 		      break;
 
 		    case 7:
-		      sprintf (logout, "%u:%u/%u.%u", bufpkt.fromzone,
+		      logprintf ("%u:%u/%u.%u", bufpkt.fromzone,
 			       bufpkt.fromnet, bufpkt.fromnode,
 			       bufpkt.frompoint);
 		      mywrite (retfile, logout, __FILE__, __LINE__);
@@ -144,7 +144,7 @@ short templat (short fhandle, short thandle)
 			{
 			  lseek (fhandle, 0, SEEK_SET);
 			  while ((fmax =
-				  (unsigned short)rread (fhandle, pktbuf,
+				  (unsigned short)rreadz (fhandle, pktbuf,
 							 buflen, __FILE__,
 							 __LINE__)) != 0)
 			    {
@@ -192,7 +192,7 @@ short templat (short fhandle, short thandle)
 			{
 			  lseek (thnd, 0, SEEK_SET);
 			  while ((fmax =
-				  (unsigned short)rread (thnd, pktbuf, buflen,
+				  (unsigned short)rreadz (thnd, pktbuf, buflen,
 							 __FILE__,
 							 __LINE__)) != 0)
 			    {

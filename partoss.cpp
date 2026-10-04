@@ -424,9 +424,10 @@ int main(int argc, char **argv)
   persarea = (struct area *)myalloc(szarea, __FILE__, __LINE__);
   memset(persarea, 0, szarea);
   pindex = (struct sqifile *)myalloc((12 * bufsqi), __FILE__, __LINE__);
-  sbuffer[0] = (char *)myalloc(4096, __FILE__, __LINE__);
-  sbuffer[2] = (char *)myalloc(1024, __FILE__, __LINE__);
-  sbuffer[3] = (char *)myalloc(1024, __FILE__, __LINE__);
+  // + 1: readblock() puts a NUL after the data
+  sbuffer[0] = (char *)myalloc(4097, __FILE__, __LINE__);
+  sbuffer[2] = (char *)myalloc(1025, __FILE__, __LINE__);
+  sbuffer[3] = (char *)myalloc(1025, __FILE__, __LINE__);
   rlist = (struct alists *)myalloc(sizeof(struct alists), __FILE__, __LINE__);
   memset(&pktaddr, 0, szmyaddr);
   readsetup();
@@ -449,8 +450,11 @@ int main(int argc, char **argv)
     bcfg.secure = !bcfg.secure;
   buflen = bcfg.bufsize;
   tottoss = totsent = 0;
-  pktbuf = (char *)myalloc(buflen, __FILE__, __LINE__);
-  sqdbuf = (char *)myalloc(buflen, __FILE__, __LINE__);
+  // + 2: room for the NULs rreadz() puts after the data
+  pktbuf = (char *)myalloc(buflen + 2, __FILE__, __LINE__);
+  sqdbuf = (char *)myalloc(buflen + 2, __FILE__, __LINE__);
+  memset(pktbuf, 0, buflen + 2);
+  memset(sqdbuf, 0, buflen + 2);
   if(bcfg.maxdupes)
     dupbuf = (unsigned long *)myalloc((szlong * bcfg.maxdupes), __FILE__, __LINE__);
 //  ccprintf("Allocated space for %u dupe entries\r\n",bcfg.defarea.dupes);
@@ -483,9 +487,9 @@ int main(int argc, char **argv)
     }
 #endif
     logfileok = 1;
-    sprintf(logout, "Begin, ParToss %s", version);
+    logprintf("Begin, ParToss %s", version);
     logwrite(1, 1);
-    sprintf(logout, "Executed: ");
+    logprintf("Executed: ");
     for(i = 0; i < argc; i++)
     {
       mystrncat(logout, argv[i], (unsigned short)(strlen(argv[i]) + 5), DirSize);
@@ -554,12 +558,12 @@ int main(int argc, char **argv)
   i |= cfgexist(bcfg.reptmpl);
   if(i)
   {
-    sprintf(logout, "Parma Tosser may not work correctly!");
+    logprintf("Parma Tosser may not work correctly!");
     logwrite(1, 1);
     ccprintf("\r\n%s\r\n", logout);
   }
 #if defined(__DOS__) && !defined(M_I386)
-  sprintf(logout, "You have %d file handles available", hcnt);
+  logprintf("You have %d file handles available", hcnt);
   logwrite(1, 3);
   ccprintf("\r\n%s\r\n", logout);
 #endif
@@ -763,7 +767,7 @@ int main(int argc, char **argv)
           if(tlist->alist[i].toss || tlist->alist[i].sent || tlist->alist[i].dupes)
           {
             asis = 0;
-            sprintf(logout, "%s:", tlist->alist[i].areaname);
+            logprintf("%s:", tlist->alist[i].areaname);
             if(tlist->alist[i].toss)
             {
               sprintf(areasbbs, " toss - %u", tlist->alist[i].toss);
@@ -809,7 +813,7 @@ int main(int argc, char **argv)
     {
       if(blink->sent)
       {
-        sprintf(logout, "Sent to %u:%u/%u.%u - %ld bytes",
+        logprintf("Sent to %u:%u/%u.%u - %ld bytes",
                 blink->address.zone, blink->address.net, blink->address.node, blink->address.point, blink->sent);
         logwrite(1, 4);
       }
@@ -908,7 +912,7 @@ short cfgexist(char *cfgfile)
     addhome(hfile, cfgfile);
     if(access(hfile, 0) == -1)
     {
-      sprintf(logout, "??? WARNING!!! File %s not found!", hfile);
+      logprintf("??? WARNING!!! File %s not found!", hfile);
       if(logfileok)
         logwrite(1, 1);
       ccprintf("\r\n%s", logout);
@@ -922,19 +926,19 @@ short cfgexist(char *cfgfile)
 // #ifdef __OS2__
 // void oblom(void)
 //  {
-//   sprintf(logout,"Exception occurs!");
+//   logprintf("Exception occurs!");
 //   if(logfileok)
 //     logwrite(1,1);
 //   ccprintf("\r\n%s\r\n",logout);
-//   sprintf(logout,"Exception name: %s",__ThrowExceptionName());
+//   logprintf("Exception name: %s",__ThrowExceptionName());
 //   if(logfileok)
 //     logwrite(1,1);
 //   ccprintf("\r\n%s\r\n",logout);
-//   sprintf(logout,"Exception occurs in file: %s",__ThrowFileName());
+//   logprintf("Exception occurs in file: %s",__ThrowFileName());
 //   if(logfileok)
 //     logwrite(1,1);
 //   ccprintf("\r\n%s\r\n",logout);
-//   sprintf(logout,"Exception occurs in line: %s",__ThrowLineNumber());
+//   logprintf("Exception occurs in line: %s",__ThrowLineNumber());
 //   if(logfileok)
 //     logwrite(1,1);
 //   ccprintf("\r\n%s\r\n",logout);

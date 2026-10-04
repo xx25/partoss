@@ -252,16 +252,16 @@ short tosspkts(void)
 //        if(logfileok)
 //         {
         if(retcode == 1)
-          sprintf(logout, "??? Inbound packet %s is damaged, look near offset %lx", cpkt->name, badpos);
+          logprintf("??? Inbound packet %s is damaged, look near offset %lx", cpkt->name, badpos);
         else if(retcode == 2)
-          sprintf(logout, "??? Inbound packet %s - wrong password", cpkt->name);
+          logprintf("??? Inbound packet %s - wrong password", cpkt->name);
         else
-          sprintf(logout, "??? Inbound packet %s - not for us", cpkt->name);
+          logprintf("??? Inbound packet %s - not for us", cpkt->name);
         ccprintf("\r\n%s\r\n", logout);
         logwrite(1, 1);
         if(!rrename(cpkt->name, pbadname))
         {
-          sprintf(logout, "??? Renamed to %s for Your intervence", pbadname);
+          logprintf("??? Renamed to %s for Your intervence", pbadname);
           ccprintf("\r\n%s\r\n", logout);
           logwrite(1, 1);
         }
@@ -269,7 +269,7 @@ short tosspkts(void)
       }
       else
       {
-        sprintf(logout, "??? Can't open inbound packet %s", cpkt->name);
+        logprintf("??? Can't open inbound packet %s", cpkt->name);
         if(logfileok)
           logwrite(1, 1);
         ccprintf("\r\n%s\r\n", logout);
@@ -309,7 +309,7 @@ short tosspkt(struct pktname *tpkt)
   pktsz = filelength(pkt);
   pktype = readhead(pkt, &pktaddr, &node);
 #ifdef __LOG_DEBUG__
-  sprintf(logout, "[D] PKT (%ld bytes) From %u:%u/%u.%u to %u:%u/%u.%u",
+  logprintf("[D] PKT (%ld bytes) From %u:%u/%u.%u to %u:%u/%u.%u",
           pktsz, pktaddr.zone, pktaddr.net, pktaddr.node, pktaddr.point, node.zone, node.net, node.node, node.point);
   ccprintf("\n%s\n", logout);
   logwrite(1, 1);
@@ -345,7 +345,7 @@ short tosspkt(struct pktname *tpkt)
     isbackup = 1;
   ccprintf("\r\n[%s] %s (%ld bytes) - %u:%u/%u.%u\r\n", fromdir[tpkt->where],
            temp, pktsz, pktaddr.zone, pktaddr.net, pktaddr.node, pktaddr.point);
-  sprintf(logout, "[%s] %s (%ld bytes) from %u:%u/%u.%u to %u:%u/%u.%u",
+  logprintf("[%s] %s (%ld bytes) from %u:%u/%u.%u to %u:%u/%u.%u",
           fromdir[tpkt->where], temp, pktsz, pktaddr.zone, pktaddr.net,
           pktaddr.node, pktaddr.point, node.zone, node.net, node.node, node.point);
   logwrite(1, 3);
@@ -376,7 +376,7 @@ short tosspkt(struct pktname *tpkt)
       create = (blink->create == 1);
   poffset = 58;
   loctoss = 0;
-  while((fmax = (unsigned short)rread(pkt, pktbuf, buflen, __FILE__, __LINE__)) > 0)
+  while((fmax = (unsigned short)rreadz(pkt, pktbuf, buflen, __FILE__, __LINE__)) > 0)
   {
     if(fmax < 34)
       break;
@@ -395,7 +395,12 @@ short tosspkt(struct pktname *tpkt)
     if((pcurpos + 34) >= fmax)
       break;
     isdupe = 0;
-    pkttobuf();
+    if(pkttobuf())
+    {
+      badpack = 1;
+      badpos = poffset;
+      goto endfunc;
+    }
     lseek(pkt, poffset, SEEK_SET);
     if(badfr)
     {
@@ -404,7 +409,7 @@ short tosspkt(struct pktname *tpkt)
       badtype = 1;
       if(badlocked)
       {
-        sprintf(logout, "BackUp: BadArea is locked");
+        logprintf("BackUp: BadArea is locked");
         logwrite(1, 3);
         backup(1);
       }
@@ -420,7 +425,7 @@ short tosspkt(struct pktname *tpkt)
         badarea = setarea(curarea, 0);
         if(badarea == -2)
         {
-          sprintf(logout, "Message in DeletedArea %s!", curarea);
+          logprintf("Message in DeletedArea %s!", curarea);
           logwrite(1, 3);
           goto deleted;
         }
@@ -430,7 +435,7 @@ short tosspkt(struct pktname *tpkt)
           totbad++;
           if(badarea > 0 && (bcfg.locked == 4))
           {
-            sprintf(logout, "BackUp: Area %s is locked", curarea);
+            logprintf("BackUp: Area %s is locked", curarea);
             logwrite(1, 3);
             totbad--;
             backup(1);
@@ -443,7 +448,7 @@ short tosspkt(struct pktname *tpkt)
               badtype = 5;
             if(badlocked)
             {
-              sprintf(logout, "BackUp: BadArea is locked");
+              logprintf("BackUp: BadArea is locked");
               logwrite(1, 3);
               backup(1);
             }
@@ -466,7 +471,7 @@ short tosspkt(struct pktname *tpkt)
                 badtype = 3;
                 if(badlocked)
                 {
-                  sprintf(logout, "BackUp: BadArea is locked");
+                  logprintf("BackUp: BadArea is locked");
                   logwrite(1, 3);
                   backup(1);
                 }
@@ -488,7 +493,7 @@ short tosspkt(struct pktname *tpkt)
                     wipearea = 0;
                     if(dupelocked)
                     {
-                      sprintf(logout, "BackUp: DupeArea is locked");
+                      logprintf("BackUp: DupeArea is locked");
                       logwrite(1, 3);
                       backup(1);
                     }
@@ -499,7 +504,7 @@ short tosspkt(struct pktname *tpkt)
                       //
                       if(bcfg.loglevel > 9)
                       {
-                        sprintf(logout, "Moved to DupeArea, reason - %s", (isdupe == 1) ? "CRC32 match" : "@PATH loop");
+                        logprintf("Moved to DupeArea, reason - %s", (isdupe == 1) ? "CRC32 match" : "@PATH loop");
                         logwrite(1, 10);
                       }
                       //
@@ -533,13 +538,13 @@ short tosspkt(struct pktname *tpkt)
                   wipearea = 0;
                   if(dupelocked)
                   {
-                    sprintf(logout, "BackUp: DupeArea is locked");
+                    logprintf("BackUp: DupeArea is locked");
                     logwrite(1, 3);
                     backup(1);
                   }
                   else
                   {
-                      sprintf(logout, "Moved to DupeArea, reason - %s", (isdupe == 1) ? "CRC32 match" : "@PATH loop");
+                      logprintf("Moved to DupeArea, reason - %s", (isdupe == 1) ? "CRC32 match" : "@PATH loop");
                       logwrite(1, 10);
                     buftosqd(dupes, dindex, 1);
                   }
@@ -565,13 +570,13 @@ short tosspkt(struct pktname *tpkt)
                     wipearea = 0;
                     if(dupelocked)
                     {
-                      sprintf(logout, "BackUp: DupeArea is locked");
+                      logprintf("BackUp: DupeArea is locked");
                       logwrite(1, 3);
                       backup(1);
                     }
                     else
                     {
-                        sprintf(logout, "Moved to DupeArea, reason - %s", (isdupe == 1) ? "CRC32 match" : "@PATH loop");
+                        logprintf("Moved to DupeArea, reason - %s", (isdupe == 1) ? "CRC32 match" : "@PATH loop");
                         logwrite(1, 10);
                       buftosqd(dupes, dindex, 1);
                     }
@@ -588,7 +593,7 @@ short tosspkt(struct pktname *tpkt)
                 badtype = 4;
                 if(badlocked)
                 {
-                  sprintf(logout, "BackUp: BadArea is locked");
+                  logprintf("BackUp: BadArea is locked");
                   logwrite(1, 3);
                   backup(1);
                 }
@@ -599,45 +604,45 @@ short tosspkt(struct pktname *tpkt)
 *********************************************/
                   if(stricmp(newarea->areaname, curarea))
                   {
-                    sprintf(logout, "***** Debug at dead:");
+                    logprintf("***** Debug at dead:");
                     logwrite(1, 11);
-                    sprintf(logout, "***** Newarea:  %s", newarea->areaname);
+                    logprintf("***** Newarea:  %s", newarea->areaname);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Persarea: %s", persarea->areaname);
+                    logprintf("***** Persarea: %s", persarea->areaname);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Badarea:  %s", badmess->areaname);
+                    logprintf("***** Badarea:  %s", badmess->areaname);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Dupearea: %s", dupes->areaname);
+                    logprintf("***** Dupearea: %s", dupes->areaname);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Curarea:  %s", curarea);
+                    logprintf("***** Curarea:  %s", curarea);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Oldarea:  %s", oldarea);
+                    logprintf("***** Oldarea:  %s", oldarea);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Message parameters:");
+                    logprintf("***** Message parameters:");
                     logwrite(1, 11);
-                    sprintf(logout, "***** Packet parameters:");
+                    logprintf("***** Packet parameters:");
                     logwrite(1, 11);
-                    sprintf(logout,
+                    logprintf(
                             "*** Packet from %u:%u/%u.%u", pktaddr.zone, pktaddr.net, pktaddr.node, pktaddr.point);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Message parameters:");
+                    logprintf("***** Message parameters:");
                     logwrite(1, 11);
-                    sprintf(logout, "***** From: %s", bufpkt.fromname);
+                    logprintf("***** From: %s", bufpkt.fromname);
                     logwrite(1, 11);
-                    sprintf(logout, "***** To: %s", bufpkt.toname);
+                    logprintf("***** To: %s", bufpkt.toname);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Subj: %s", bufpkt.subj);
+                    logprintf("***** Subj: %s", bufpkt.subj);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Date: %s", bufpkt.datetime);
+                    logprintf("***** Date: %s", bufpkt.datetime);
                     logwrite(1, 11);
-                    sprintf(logout, "***** Kludges:");
+                    logprintf("***** Kludges:");
                     logwrite(1, 11);
                     tkludge = pckludge;
                     while(tkludge)
                     {
                       if(tkludge->str[0] == 1)
                         tkludge->str[0] = '@';
-                      sprintf(logout, "%s", tkludge->str);
+                      logprintf("%s", tkludge->str);
                       logwrite(1, 11);
                       tkludge = tkludge->next;
                     }
@@ -647,20 +652,20 @@ short tosspkt(struct pktname *tpkt)
  Emergency exit in case of this uncatched bug
 *********************************************/
                   buftosqd(badmess, bindex, 1);
-                  sprintf(logout,
+                  logprintf(
                           "*** Packet was from %u:%u/%u.%u", pktaddr.zone, pktaddr.net, pktaddr.node, pktaddr.point);
                   logwrite(1, 10);
-                  sprintf(logout, "*** Packet address was not found in links of area %s:", newarea->areaname);
+                  logprintf("*** Packet address was not found in links of area %s:", newarea->areaname);
                   logwrite(1, 10);
                   tttaddr = newarea->links.chain;
                   while(tttaddr)
                   {
-                    sprintf(logout, "**** %u:%u/%u.%u", tttaddr->zone, tttaddr->net, tttaddr->node, tttaddr->point);
+                    logprintf("**** %u:%u/%u.%u", tttaddr->zone, tttaddr->net, tttaddr->node, tttaddr->point);
                     logwrite(1, 10);
                     tttaddr = tttaddr->next;
                   }
                   // More precisely debug info
-                  sprintf(logout, "***** Debug info 2: [%s] [%s] [%s]", newarea->areaname, persarea->areaname, curarea);
+                  logprintf("***** Debug info 2: [%s] [%s] [%s]", newarea->areaname, persarea->areaname, curarea);
                   logwrite(1, 11);
                 }
                 wipearea = 1;

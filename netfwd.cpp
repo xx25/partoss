@@ -309,7 +309,7 @@ void fwdprepare (void)
     return;
   if (fwdempty ())
     {
-      sprintf (logout, "Netmail for %s not forwarded: empty message",
+      logprintf ("Netmail for %s not forwarded: empty message",
 	       fwdtoname);
       logwrite (1, 3);
       fwdclear ();
@@ -387,7 +387,7 @@ void fwdsend (void)
 	}
       myfree ((void **)&head->str, __FILE__, __LINE__);
       myfree ((void **)&head, __FILE__, __LINE__);
-      sprintf (logout, "Netmail for %s forwarded to %u:%u/%u.%u", fwdtoname,
+      logprintf ("Netmail for %s forwarded to %u:%u/%u.%u", fwdtoname,
 	       target->zone, target->net, target->node, target->point);
       logwrite (1, 3);
       if (!quiet)

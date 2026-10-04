@@ -127,9 +127,9 @@ char *locseenby (char *buf)
   while (temp)
     {
       temp2 = temp - 1;
-      while (temp2 && (*temp2 == '\n'))
+      while (temp2 >= buf && (*temp2 == '\n'))
   temp2--;
-      if (temp2 && (*temp2 == '\r'))
+      if (temp2 < buf || (*temp2 == '\r'))
   return temp;
       temp2 = temp + 1;
       temp = strstr (temp2, "SEEN-BY: ");
@@ -144,9 +144,9 @@ char *locpath (char *buf)
   while (temp)
     {
       temp2 = temp - 1;
-      while (temp2 && (*temp2 == '\n'))
+      while (temp2 >= buf && (*temp2 == '\n'))
   temp2--;
-      if (temp2 && (*temp2 == '\r'))
+      if (temp2 < buf || (*temp2 == '\r'))
   return temp;
       temp2 = temp + 1;
       temp = strstr (temp2, "\1PATH: ");
@@ -189,7 +189,7 @@ void parsesnb (char *temp, short type)
         //
         if (bcfg.loglevel > 10)
     {
-      sprintf (logout,
+      logprintf (
          "Path loop detected. Our AKA - %u:%u/%u.%u, found in path - %u/%u",
          newarea->myaka.zone, newarea->myaka.net,
          newarea->myaka.node, newarea->myaka.point,
@@ -537,7 +537,7 @@ void getctrl (char *text, unsigned short len, short type)
         arealen = arealength + 4;
       memcpy (curarea, temp + 5 + spaces, arealen - 5 - spaces);
       //areaaliasmaker
-      /*sprintf(logout,"Message from %s, %u:%u/%u.%u to %s, %u:%u/%u.%u about \"%s\"",
+      /*logprintf("Message from %s, %u:%u/%u.%u to %s, %u:%u/%u.%u about \"%s\"",
          bufpkt.fromname, bufpkt.fromzone, bufpkt.fromnet, bufpkt.fromnode,
          bufpkt.frompoint, bufpkt.toname, bufpkt.tozone, bufpkt.tonet,
          bufpkt.tonode, bufpkt.topoint, bufpkt.subj);
@@ -781,7 +781,7 @@ void getctrl (char *text, unsigned short len, short type)
       mystrncat (source, satt, DirSize, DirSize);
       rrename (source, att);
     }
-        sprintf (logout, "\1ATTACH: %s %s\r", satt, tatt);
+        logprintf ("\1ATTACH: %s %s\r", satt, tatt);
         break;
 
       default:

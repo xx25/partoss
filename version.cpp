@@ -48,7 +48,7 @@ void printversion(void)
 #define verplatform "/UNK"
 #endif
   mystrncpy (version, VERSION verplatform vversion, MAX_VERSIONLEN - 1);
-  sprintf(logout, "The Parma Tosser version %s", version);
+  logprintf("The Parma Tosser version %s", version);
   ccprintf("%s\r\n", logout);
 #ifdef __NT__
   SetConsoleTitle(logout);

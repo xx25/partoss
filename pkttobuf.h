@@ -1,1 +1,1 @@
-void pkttobuf (void);
+short pkttobuf (void);

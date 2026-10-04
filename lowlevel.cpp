@@ -48,6 +48,7 @@ void readblock (short handle, short level)
   bufs = (level > 1) ? 1024 : 4096;
   char *buf = sbuffer[level];
   bsize = rread (handle, buf, bufs, __FILE__, __LINE__);
+  buf[bsize] = 0;               // sbuffer[] has room for bufs + 1
   curspos[level] = 0;
   j = 0;
   if (bsize < bufs)
@@ -329,7 +330,7 @@ void badlog (struct area *barea)
         mystrncat (tstr, barea->areafp, DirSize, CSSize);
         break;
       case 'A':
-        sprintf (logout, "%u:%u/%u.%u", barea->myaka.zone,
+        logprintf ("%u:%u/%u.%u", barea->myaka.zone,
            barea->myaka.net, barea->myaka.node,
            barea->myaka.point);
         mystrncat (tstr, logout, (short)(strlen (logout) + 5), CSSize);
@@ -405,24 +406,24 @@ void badlog(short type)
    {
     oldlog=logfile;
     logfile=blog;
-    sprintf(logout,"Message to area %s put in BadArea:",curarea);
+    logprintf("Message to area %s put in BadArea:",curarea);
     logwrite(1,1);
-    sprintf(logout,"From: %s",buftemp->fromname);
+    logprintf("From: %s",buftemp->fromname);
     logwrite(1,1);
-    sprintf(logout,"To:   %s",buftemp->toname);
+    logprintf("To:   %s",buftemp->toname);
     logwrite(1,1);
-    sprintf(logout,"Subj: %s",buftemp->subj);
+    logprintf("Subj: %s",buftemp->subj);
     logwrite(1,1);
     switch(type)
      {
       case 1:
-        sprintf(logout,"Reason: grunded message");
+        logprintf("Reason: grunded message");
         break;
       case 2:
-        sprintf(logout,"Reason: unknown area, AutoCreate disabled");
+        logprintf("Reason: unknown area, AutoCreate disabled");
         break;
       case 3:
-        sprintf(logout,"Reason: security violation");
+        logprintf("Reason: security violation");
         break;
      }
     logwrite(1,1);
@@ -689,7 +690,7 @@ void addpacket (char *path, short where)
   if (packname[0] && packname[strlen (packname) - 1] != DIRSEP[0])
     mystrncat (packname, DIRSEP, 3, DirSize);
   mystrncat (packname, PKT_MASK, 7, DirSize);
-  sprintf (logout, "Processing inbound directory %s", packname);
+  logprintf ("Processing inbound directory %s", packname);
   logwrite (1, 11);
   good = (short)_dos_findfirst (packname, findattr, &fblk);
   while (good == 0)
@@ -700,7 +701,7 @@ void addpacket (char *path, short where)
       if (currname[0] && currname[strlen (currname) - 1] != DIRSEP[0])
         mystrncat (currname, DIRSEP, 3, DirSize);
       mystrncat (currname, fblk.name, DirSize, DirSize);
-      sprintf (logout, "--- Adding of %s", currname);
+      logprintf ("--- Adding of %s", currname);
       logwrite (1, 11);
       if (fpkt == NULL)
       {
@@ -822,7 +823,7 @@ void myfree (void **buf, char *file, unsigned short line)
 /*
   if(logfileok)
    {
-    sprintf(logout,"%4x:%4x",FP_SEG(*buf),FP_OFF(*buf));
+    logprintf("%4x:%4x",FP_SEG(*buf),FP_OFF(*buf));
     logwrite(1);
    }
 */
@@ -881,9 +882,9 @@ short rrename (char *from, char *to)
       break;
     if (lich)
       {
-        sprintf (logout, "Waiting for rename %s to %s", from, to);
+        logprintf ("Waiting for rename %s to %s", from, to);
         logwrite (1, 1);
-        sprintf (logout, "Previous try returned %d, errno - %d", result,
+        logprintf ("Previous try returned %d, errno - %d", result,
            terr);
         logwrite (1, 1);
       }

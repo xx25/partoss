@@ -1386,7 +1386,7 @@ int linkArea (const char *areaFile, int linkType)
 	      frames);
   if (changed_count)
     {
-      sprintf (logout, "Linking %s: %lu of %lu", AREANAME, changed_count,
+      logprintf ("Linking %s: %lu of %lu", AREANAME, changed_count,
 	       frames);
       logwrite (1, 1);
     }

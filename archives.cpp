@@ -191,9 +191,9 @@ int archiver(char *arcname, char *packname, short type)
 
     }
     if(type == 1)
-      sprintf(logout, "Un%sing %s", arcdef.name, arcname);
+      logprintf("Un%sing %s", arcdef.name, arcname);
     else
-      sprintf(logout, "%sing %lu bytes for %u:%u/%u.%u", arcdef.name,
+      logprintf("%sing %lu bytes for %u:%u/%u.%u", arcdef.name,
               arclen, tpack->outaddr.zone, tpack->outaddr.net, tpack->outaddr.node, tpack->outaddr.point);
     logwrite(1, 2);
 
@@ -407,7 +407,7 @@ int archiver(char *arcname, char *packname, short type)
             temp[3] = 't';
           }
         }
-        sprintf(logout, "??? Rename of file %s (Archiver's error %X)", (type == 1 ? fulname : packname), retcode);
+        logprintf("??? Rename of file %s (Archiver's error %X)", (type == 1 ? fulname : packname), retcode);
         if(rrename((type == 1 ? fulname : packname), badname))
           strcat(logout, " fails");
         if(logfileok)
@@ -419,7 +419,7 @@ int archiver(char *arcname, char *packname, short type)
   }
   else
   {
-    sprintf(logout, "??? Unknown archive type - %s\r\n", type == 1 ? arcname : defarc);
+    logprintf("??? Unknown archive type - %s\r\n", type == 1 ? arcname : defarc);
     if(logfileok)
       logwrite(1, 1);
     ccprintf("\r\n%s\r\n", logout);

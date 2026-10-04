@@ -96,8 +96,19 @@ unsigned rread (short handle, void *buf, unsigned len, char *file, short line)
   if (handle == 0)
     errexit (4, file, line);
   result = read (handle, buf, len);
-  if (result == 65535u)
+  // -1 is 65535 on 16-bit targets and 0xffffffff on 32-bit ones
+  if (result == 65535u || result == (unsigned)-1 || result > len)
     errexit (7, file, line);
+  return result;
+}
+
+// rread into a text buffer that has room for len + 2 bytes; two NULs
+// follow the data, so string functions stop inside the buffer
+unsigned rreadz (short handle, void *buf, unsigned len, char *file, short line)
+{
+  unsigned result = rread (handle, buf, len, file, line);
+  ((char *)buf)[result] = 0;
+  ((char *)buf)[result + 1] = 0;
   return result;
 }
 
@@ -170,7 +181,7 @@ short mysopen (char *fname, short type, char *file, short line)
 	  case EACCES:
 	    if (lich)
 	      {
-		sprintf (logout, "Waiting for open %s", fname);
+		logprintf ("Waiting for open %s", fname);
 		logwrite (1, 1);
 	      }
 	    mtsleep (5);
