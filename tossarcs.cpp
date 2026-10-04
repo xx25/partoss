@@ -26,6 +26,29 @@
 
 long badpos;
 
+// Inbound archive names come from the mailer and are passed to the shell
+// (BeforeUnpack, batch/script unpackers): allow plain file names only
+static short safearcname(char *name)
+{
+  char *temp = strrchr(name, DIRSEP[0]);
+
+  temp = temp ? temp + 1 : name;
+  if(!*temp)
+    return 0;
+  for(; *temp; temp++)
+    if(!isalnum((unsigned char)*temp) && !strchr("._-~+", *temp))
+      return 0;
+  return 1;
+}
+
+static void unsafearc(char *name)
+{
+  logprintf("??? Archive %s has an unsafe name, not unpacked", name);
+  if(logfileok)
+    logwrite(1, 1);
+  ccprintf("\r\n%s\r\n", logout);
+}
+
 void tossarcs(void)
 {
   short i, t, cycle = 1, wasunp = 2;
@@ -99,6 +122,11 @@ void tossarcs(void)
                 {
                   mystrncpy(currname, tinbound->name, DirSize);
                   mystrncat(currname, fblk.name, DirSize, DirSize);
+                  if(!safearcname(currname))
+                  {
+                    unsafearc(currname);
+                    goto nextarc;
+                  }
                   if(bcfg.sbu[0]) // Запускаем процесс BeforeUnpack
                   {
                     mystrncpy(ssystem, bcfg.sbu, DirSize);
@@ -130,6 +158,7 @@ void tossarcs(void)
                 }
               }
             }
+          nextarc:
             pgood = (short)_dos_findnext(&fblk);
           }
           _dos_findclose(&fblk);
@@ -143,6 +172,11 @@ void tossarcs(void)
       tapkt = apkt;
       while(tapkt)
       {
+        if(!safearcname(tapkt->name))
+        {
+          unsafearc(tapkt->name);
+          goto freearc;
+        }
         if(bcfg.sbu[0]) // Запускаем процесс BeforeUnpack
         {
           mystrncpy(ssystem, bcfg.sbu, DirSize);
@@ -171,6 +205,7 @@ void tossarcs(void)
         }
         if(!bcfg.bunarc)
           cycle |= tosspkts();
+      freearc:
         tinbound = tapkt->next;
         myfree((void **)&tapkt, __FILE__, __LINE__);
         tapkt = tinbound;

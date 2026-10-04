@@ -74,6 +74,7 @@ int spawnvp(int __mode, const char *__path, char *const *__argv)
   if(pid == 0)
   {
     execvp(__path, __argv);
+    _exit(127);                 // exec failed: do not go on as a second tosser
   }
   do
   {
@@ -123,7 +124,7 @@ unsigned _dos_findfirst(const char *__path, unsigned __attr, struct find_t *__bu
 {
   int len = strlen(__path);
   int __handle;
-  char __full_path[256];
+  char __full_path[1024];
   struct dirent *__entry;
   struct stat __stat;
   unsigned ret = 0;
@@ -134,7 +135,7 @@ unsigned _dos_findfirst(const char *__path, unsigned __attr, struct find_t *__bu
   __buf->__pattern = NULL;
   __buf->__path_only = NULL;
 
-  while((__path[len - 1] != '/') && (len > 0))
+  while((len > 0) && (__path[len - 1] != '/'))
     len--;
   if((len > 0) && (__path[len - 1] == '/'))
   {
@@ -189,7 +190,7 @@ unsigned _dos_findfirst(const char *__path, unsigned __attr, struct find_t *__bu
 //    (char *)calloc (strlen (__path) - strlen (__buf->__path_only), 1);
 //  strncpy (__buf->__pattern, __path + (strlen (__buf->__path_only) + 1),
 //         strlen (__path) - strlen (__buf->__path_only));
-  memset(__full_path, 0, 256);
+  memset(__full_path, 0, sizeof(__full_path));
   while(__entry != NULL)
   {
     ret = fnmatch(__buf->__pattern, __entry->d_name, 0);
@@ -202,9 +203,7 @@ unsigned _dos_findfirst(const char *__path, unsigned __attr, struct find_t *__bu
       /*
          fill struct stat __stat 
        */
-      strcpy(__full_path, __buf->__path_only);
-      strcat(__full_path, "/");
-      strcat(__full_path, __entry->d_name);
+      snprintf(__full_path, sizeof(__full_path), "%s/%s", __buf->__path_only, __entry->d_name);
       __handle = open(__full_path, O_RDONLY);
       if(__handle == -1)
       {
@@ -243,7 +242,7 @@ unsigned _dos_findfirst(const char *__path, unsigned __attr, struct find_t *__bu
       ccprintf("Found name: %s\n", __buf->name);
       ccprintf("Filesize: %u\n", __buf->size);
 #endif
-      memset(__full_path, 0, 256);
+      memset(__full_path, 0, sizeof(__full_path));
 #ifndef __FreeBSD__
       __buf->dir_pos = telldir(__buf->__entry);
 #endif
@@ -283,7 +282,7 @@ unsigned _dos_findnext(struct find_t *__buf)
   struct dirent *__entry;
   struct stat __stat;
   unsigned ret = 0;
-  char __full_path[256];
+  char __full_path[1024];
   int __handle;
 
 #ifdef __FreeBSD__
@@ -300,7 +299,7 @@ unsigned _dos_findnext(struct find_t *__buf)
       perror("opendir/_dos_findnext error");
     return 2;
   }
-  memset(__full_path, 0, 256);
+  memset(__full_path, 0, sizeof(__full_path));
 
 #ifndef __FreeBSD__
   seekdir(__buf->__entry, __buf->dir_pos);
@@ -331,9 +330,7 @@ unsigned _dos_findnext(struct find_t *__buf)
       /*
          fill struct stat __stat 
        */
-      strcpy(__full_path, __buf->__path_only);
-      strcat(__full_path, "/");
-      strcat(__full_path, __entry->d_name);
+      snprintf(__full_path, sizeof(__full_path), "%s/%s", __buf->__path_only, __entry->d_name);
       __handle = open(__full_path, O_RDONLY);
       if(__handle == -1)
       {
@@ -365,7 +362,7 @@ unsigned _dos_findnext(struct find_t *__buf)
       }
       if(close(__handle) == -1)
         perror("close/_dos_findnext error");
-      memset(__full_path, 0, 256);
+      memset(__full_path, 0, sizeof(__full_path));
 #ifndef __FreeBSD__
       __buf->dir_pos = telldir(__buf->__entry);
 #endif
