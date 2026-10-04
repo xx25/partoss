@@ -643,7 +643,7 @@ founddef:
 	}
   if (usingshablon == 0)
       memcpy (&tdefarea, &bcfg.defarea, szarea);
-  mystrncpy (crarea->areaname, areaname, arealength);
+  mystrncpy (crarea->areaname, areaname, arealength - 1);
   mystrncpy (crarea->areafp, newname, DirSize);
   crarea->type = 1;
   crarea->days = tdefarea.days;
@@ -751,7 +751,7 @@ founddef:
       link = link->next;
     }
   anew = (struct areaindex *)myalloc (szareaindex, __FILE__, __LINE__);
-  mystrncpy (anew->areaname, areaname, arealength);
+  mystrncpy (anew->areaname, areaname, arealength - 1);
   anew->areaoffs = lseek (areaset, 0, SEEK_END);
   anew->scanned = anew->type = 1;
   anew->toss = anew->sent = anew->dupes = 0;

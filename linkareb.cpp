@@ -1143,10 +1143,8 @@ int linkArea (const char *areaFile, int linkType)
   int ctrlsize = 1024;		// Размер буффера для кладжей
   char *ctrl;			// Собственно буффер. Пока не распределенный. 8)
 
-  strcpy (index_file, areaFile);
-  strcat (index_file, ".sqi");
-  strcpy (base_file, areaFile);
-  strcat (base_file, ".sqd");
+  snprintf (index_file, sizeof (index_file), "%s.sqi", areaFile);
+  snprintf (base_file, sizeof (base_file), "%s.sqd", areaFile);
 
   // Доступ на чтение не запрещаем - менять ничего в файле не будем.
   hi = sopen (index_file, O_RDONLY | O_BINARY, SH_DENYWR);

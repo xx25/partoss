@@ -1284,7 +1284,7 @@ void makelist(short type, short sort)   // type: 1 - list, 2 - query,
   short i, j, status, dend, numstr, k, gwr = 0;
   char *sstatus[] =
     { "Active", "Unlinked", "Restricted", "Passive", "ReadOnly" }, *descr =
-    NULL, *tdesc = NULL, *tdesc2 = NULL, format[arealength + 1], curgr = ' ', glogout[DirSize + 1];
+    NULL, *tdesc = NULL, *tdesc2 = NULL, format[arealength + 1], curgr = ' ', glogout[DirSize + 8];
   struct myaddr *link = NULL, tsnd;
   struct link *blink = NULL;
   struct alists *ttlist = NULL;
@@ -1774,7 +1774,7 @@ fordelarea:
               };
 
               memcpy(&utarea, tuplink, sizeof(struct uplname));
-              mystrncpy(utarea.persarea, tname->persarea, arealength);
+              mystrncpy(utarea.persarea, tname->persarea, arealength - 1);
               utarea.where = 1;
 //            memcpy(&utarea.upaddr,&tuplink->upaddr,szmyaddr);
               if(uareas == NULL)
@@ -2334,7 +2334,7 @@ void changelink(struct link *blink)
 void chlinkcfg(struct link *blink, char *file)
 {
   short prttemp;
-  char bakname[(DirSize + 1)], tbakname[(DirSize + 1)], tstyle[4], *temp = NULL, tstr[arealength], *mas = "0000";
+  char bakname[(DirSize + 1)], tbakname[(DirSize + 1)], tstyle[4], *temp = NULL, tstr[96], *mas = "0000";
 
   setf = mysopen(file, 0, __FILE__, __LINE__);
   mystrncpy(tbakname, file, DirSize);
@@ -2862,7 +2862,7 @@ void delorph(struct uplname *utarea, struct uplname *ttname)
   if(ttname)
   {
     memcpy(utarea, ttname, sizeof(struct uplname));
-    mystrncpy(utarea->persarea, newarea->areaname, arealength);
+    mystrncpy(utarea->persarea, newarea->areaname, arealength - 1);
     utarea->where = 2;
     if(uareas == NULL)
     {
@@ -2945,7 +2945,7 @@ void delorphn(struct uplname *utarea, struct uplname *ttname, char *descr)
   if(ttname)
   {
     memcpy(utarea, ttname, sizeof(struct uplname));
-    mystrncpy(utarea->persarea, newarea->areaname, arealength);
+    mystrncpy(utarea->persarea, newarea->areaname, arealength - 1);
     utarea->where = 2;
     if(uareas == NULL)
     {

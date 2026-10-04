@@ -225,7 +225,7 @@ short buftosqd (struct area *ttarea, struct sqifile *tindex, short type)
     {
       tpmsglen += strlen (temp2);
       if (((temp3 = locseenby (temp)) != NULL) && (temp3 < temp2))
-        strcpy (temp3, temp2);
+        memmove (temp3, temp2, strlen (temp2) + 1);   // overlapping
     }
   break;
       }

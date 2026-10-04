@@ -2371,9 +2371,9 @@ void parser(char *file, short level)
             gettoken(level);
             parseaddr(token, &(al.linkaddr), toklen);
             gettoken(level);
-            tokencpy(al.sarea, arealength);
+            tokencpy(al.sarea, arealength - 1);
             gettoken(level);
-            tokencpy(al.darea, arealength);
+            tokencpy(al.darea, arealength - 1);
             areaaliaslist.add_el(al);
           }
           break;

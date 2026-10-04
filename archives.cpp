@@ -409,7 +409,7 @@ int archiver(char *arcname, char *packname, short type)
         }
         logprintf("??? Rename of file %s (Archiver's error %X)", (type == 1 ? fulname : packname), retcode);
         if(rrename((type == 1 ? fulname : packname), badname))
-          strcat(logout, " fails");
+          mystrncat(logout, " fails", 7, BufSize);
         if(logfileok)
           logwrite(1, 1);
         if(!quiet)
